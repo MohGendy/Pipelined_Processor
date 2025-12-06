@@ -2,6 +2,7 @@
 *
 
 # But keep these extensions
+!*/
 !*.do
 !*.v
 !*.gitignore
