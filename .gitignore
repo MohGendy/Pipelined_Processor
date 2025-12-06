@@ -4,5 +4,7 @@
 # But keep these extensions
 !*/
 !*.do
+!*.tcl
+!*.txt
 !*.v
 !*.gitignore
