@@ -45,6 +45,7 @@ module pc_new_tb;
         #10;
         $display("Test 5 - pc_new: %h (Expected: 40)", pc_new);
 
-        $finish;
+        $stop;
     end
 endmodule
+
