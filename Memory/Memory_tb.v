@@ -73,12 +73,12 @@ end
 //DUT instantiation
 Memory DUT (
     .clk(clk_tb) ,
-    .addr1(addr1_tb) ,
-    .addr2(addr2_tb) ,
+    .I_addr(addr1_tb) ,
+    .D_addr(addr2_tb) ,
     .Wdata(Wdata_tb) ,
     .WEn(WEn_tb) ,
-    .Rdata1(Rdata1_tb) ,
-    .Rdata2(Rdata2_tb)
+    .I_data(Rdata1_tb) ,
+    .D_data(Rdata2_tb)
 );
 
 endmodule
