@@ -1,4 +1,4 @@
-/* I/O Ports + external interrupt + a latch so the interrupt is remembered until the CU explicitly clears it. (Don't forget to check _REMINDER_'s*/ 
+/* I/O Ports + external interrupt + a latch so the interrupt is remembered until the CU explicitly clears it. (Don't forget to check _REMINDER_'s)*/ 
 module ports_interrupt (
 // system clock    
 input clk,          
@@ -64,3 +64,4 @@ assign data_to_cpu = in_en ? in_port : 8'b00000000;
 assign intr_flag = intr_flag_r;
 
 endmodule
+
