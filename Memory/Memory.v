@@ -12,8 +12,8 @@ module Memory #(parameter Width = 256 ,addr_width = 8 , Depth = 8 , Data_base = 
 reg [Depth-1:0] Mem [Width-1:0] ;
 
 always @(posedge clk) begin
-    I_data = Mem[I_addr] ;
-    D_data = Mem[D_addr + Data_base] ;
+    I_data <= Mem[I_addr] ;
+    D_data <= Mem[D_addr + Data_base] ;
     if(WEn) begin
         Mem[D_addr] <= Wdata ;
     end
