@@ -1,0 +1,18 @@
+module pc_in_mux (
+    input  [1:0] pc_src,
+    input  [7:0] data_out, // X[++sp]
+    input  [7:0] reg_rb_d , // R[rb] from D stage (Loop , Branch)
+    input  [7:0] I_out,   // M[0] or M[1]
+    input  [7:0] reg_rb_ex,  // R[rb] from EX stage (Jump , Call)
+    output reg [7:0] pc_in
+);
+always @(*) begin
+    case (pc_src)
+        2'b00: pc_in = reg_rb_ex;
+        2'b01: pc_in = I_out;
+        2'b10: pc_in = reg_rb_d;
+        2'b11: pc_in = data_out;
+        default: pc_in = 8'b0;
+    endcase 
+end
+endmodule
