@@ -8,6 +8,7 @@ parameter Width = 8'd256 ,addr_width = 8 , Depth = 8 , Data_base = 8'd128 ;
 integer test_case = 1 , succeeded = 0 , cases = 3;
 
 reg clk_tb ;
+reg rst_tb ;
 reg [addr_width-1:0] addr1_tb ;       
 reg [addr_width-1:0] addr2_tb ;      
 reg [Depth-1:0] Wdata_tb ;          
@@ -19,11 +20,18 @@ initial begin
     //initialize 
         $readmemh("hex_numbers.txt",DUT.Mem);
         clk_tb = 1'b0 ;
+        rst_tb = 1'b1 ;
         addr1_tb = 'h0 ;
         addr2_tb = 'h0 ;
         Wdata_tb = 'b0 ;
         WEn_tb = 1'b0 ;
 
+    #(clk_period*5);
+
+    //reset 
+    rst_tb = 1'b0 ;
+    #(clk_period*5);
+    rst_tb = 1'b1 ;
     #(clk_period*5);
 
     //test 1 
@@ -73,12 +81,13 @@ end
 //DUT instantiation
 Memory DUT (
     .clk(clk_tb) ,
-    .addr1(addr1_tb) ,
-    .addr2(addr2_tb) ,
+    .rst(rst_tb) ,
+    .I_addr(addr1_tb) ,
+    .D_addr(addr2_tb) ,
     .Wdata(Wdata_tb) ,
     .WEn(WEn_tb) ,
-    .Rdata1(Rdata1_tb) ,
-    .Rdata2(Rdata2_tb)
+    .I_data(Rdata1_tb) ,
+    .D_data(Rdata2_tb)
 );
 
 endmodule
