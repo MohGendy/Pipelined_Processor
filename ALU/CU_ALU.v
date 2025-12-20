@@ -6,7 +6,7 @@ module CU
   input wire [1:0] ra , 
   input wire [1:0] rb ,
   output reg SE1 , SE2 ,
-  output reg [1:0] SE3 , SE4 ,
+  output reg [1:0] SE3 , 
   output reg [3:0] ALU_CONTROL
 );
 
@@ -17,7 +17,6 @@ always @ (*)
    SE1 = 1'b0  ;
    SE2 = 1'b0  ;
    SE3 = 2'b00 ;
-   SE4 = 2'b00 ;
 
       case (op_code)
    
@@ -72,6 +71,12 @@ always @ (*)
          endcase
 
       end 
+      
+      4'b0111 : begin //POP
+         ALU_CONTROL = 4'b0010 ;
+         SE2 = 1'b0 ;
+
+      end
 
       4'b1000 : begin 
          case(ra)
@@ -94,12 +99,25 @@ always @ (*)
          endcase
       end
      
+     4'b1010 : begin //LOOP
+      ALU_CONTROL = 4'b0011 ;
+      SE1 = 1'b1 ;
+      SE2 = 1'b0 ;
+     end
+
+     4'b1011 : begin 
+      if (ra == 2'b10 || ra = 2'b11 )//RET or RTI 
+      ALU_CONTROL = 4'b0010 ;
+      SE1 = 1'b1;
+      SE2 = 1'b0;
+
+     end
+
       default : begin 
          ALU_CONTROL = 4'b0000 ;
          SE1 = 1'b0  ;
          SE2 = 1'b0  ;
          SE3 = 2'b00 ;
-         SE4 = 2'b00 ;
       end
       endcase
 end
