@@ -1,3 +1,5 @@
+// to do (for gendy) : stack pointer case
+
 /* Module: Hazard and Forwarding Unit
     Description: 
     This unit detects data dependencies between the current instruction in Execute stage (ID/EX)
