@@ -12,7 +12,6 @@ module PC_CU (
     output reg         pc_load,
    // output reg         byte_sel,
    // output reg         if_en,
-    output reg         instr_done,
     output reg [1:0]   pc_src,
     output reg [1:0]   addr_src    
 );
@@ -120,7 +119,6 @@ always @(*) begin
 
     // ===== EXECUTE / PC DECISION =====
     S_DONE: begin
-        instr_done = 1;
         if (intr) begin
             pc_en   = 1;
             pc_load = 1;
@@ -169,4 +167,5 @@ always @(*) begin
 end
 
 endmodule
+
 
