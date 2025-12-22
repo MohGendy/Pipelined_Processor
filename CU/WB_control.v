@@ -11,7 +11,10 @@ module WB_CU_controls(
 
     // stack pointer controls (R3)
     output reg sp_inc,
-    output reg sp_dec
+    output reg sp_dec,
+
+    // out port ld signal
+    output reg ld_out
 );
 
     always @(*) begin
@@ -20,6 +23,7 @@ module WB_CU_controls(
         sw2      = 1'b0;
         sp_inc   = 1'b0;
         sp_dec   = 1'b0;
+        ld_out   = 1'b0;
         
         case (opcode)
             // MOV, ADD, SUB, AND, OR, NOT/NEG/INC/DEC  (dest = ra)
@@ -62,6 +66,7 @@ module WB_CU_controls(
                     2'b10: begin
                         // OUT: OUT.PORT <- R[rb] (no RF write)
                         write_en = 1'b0;
+                        ld_out   = 1'b1;
                     end
                     2'b11: begin
                         // IN: R[rb] <- IN.PORT
@@ -72,16 +77,29 @@ module WB_CU_controls(
                 endcase
             end
 
-            // LDM (opcode 12, ra=0) -> R[rb] <- imm
+            // loop (opcode 10)
+            4'd10: begin
+                write_en = 1'b1;
+                sw1      = 1'b0;
+                sw2      = 1'b0;
+            end
+
+            // CALL / RET / RTI (opcode 11, ra=1,2,3)
+            4'd11: begin
+                if(ra_wb == 2'b01) sp_dec = 1'b1;
+                else if(ra_wb == 2'b10 || ra_wb == 2'b11 ) sp_inc = 1'b1;
+            end
+
+            // LDM/LDD (opcode 12, ra=0,1) -> R[rb] <- data_out
             4'd12: begin
-                if (ra_wb == 2'b00) begin
+                if (ra_wb == 2'b00 || ra_wb == 2'b01) begin
                     write_en = 1'b1;
                     sw1      = 1'b1;  // dest = rb
                     sw2      = 1'b0;
                 end
             end
 
-            // LDD/LDI (opcode 13) -> R[rb] <- M[...]
+            // LDI (opcode 13) -> R[rb] <- data_out
             4'd13: begin
                 write_en = 1'b1;
                 sw1      = 1'b1;  // dest = rb
