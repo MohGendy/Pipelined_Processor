@@ -10,9 +10,8 @@ module PC_CU (
     input  V_flag,
     output reg         pc_en,
     output reg         pc_load,
-    output reg         byte_sel,
-    output reg         if_en,
-    output reg         instr_done,
+   // output reg         byte_sel,
+   // output reg         if_en,
     output reg [1:0]   pc_src,
     output reg [1:0]   addr_src    
 );
@@ -75,8 +74,8 @@ always @(*) begin
     // defaults
     pc_en      = 0;
     pc_load    = 0;
-    byte_sel   = 0;
-    if_en      = 0;
+  //  byte_sel   = 0;
+  //  if_en      = 0;
     instr_done = 0;
     pc_src     = 2'b00;
     addr_src   = 2'b00;
@@ -88,7 +87,7 @@ always @(*) begin
         pc_en   = 1;
         pc_load = 1;
         pc_src  = 2'b01;   // I_out
-        if_en   = 1;
+    //    if_en   = 1;
         addr_src = 2'b01; // M[0]
     if (!reset)  
         next_state = S_FETCH1;
@@ -101,7 +100,7 @@ always @(*) begin
         if (!pc_was_loaded) begin
             pc_en = 1;
         end
-        if_en = 1;
+      //  if_en = 1;
         addr_src = 2'b00; // normal fetch
 
         if (two_byte)
@@ -113,14 +112,13 @@ always @(*) begin
     // ===== FETCH IMM / EA =====
     S_FETCH2: begin
         pc_en    = 1;
-        if_en    = 1;
-        byte_sel = 1;
+     //   if_en    = 1;
+     //   byte_sel = 1;
         next_state = S_DONE;
     end
 
     // ===== EXECUTE / PC DECISION =====
     S_DONE: begin
-        instr_done = 1;
         if (intr) begin
             pc_en   = 1;
             pc_load = 1;
@@ -169,3 +167,5 @@ always @(*) begin
 end
 
 endmodule
+
+
