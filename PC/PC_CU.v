@@ -5,7 +5,7 @@ module PC_CU (
     input   [3:0]  opcode,
     input   [1:0]  brx,
     input  branch_taken,
-    input  bypass_decode_done,
+    input  bypass_decode_done,  // 1 = Bypass from Decode stage is done or no bypass needed , 0 = Bypass not done yet
     output reg         pc_en,
     output reg         pc_load,
     output reg         stall,
@@ -18,7 +18,7 @@ localparam
     S_FETCH1 = 3'd1,
     S_FETCH2 = 3'd2,
     S_WAIT   = 3'd3,
-    S_BRANCH   = 3'd4;
+    S_BRANCH = 3'd4;
 
 reg [2:0] state, next_state;
 reg two_byte;
@@ -39,16 +39,23 @@ end
 
 // Track if PC was loaded (for branches, jumps, etc.)
 always @(posedge clk) begin
-    if (reset)
-        pc_was_loaded <= 1'b1;  // Reset loads PC
-    else if (intr)
-        pc_was_loaded <= 1'b1;  // Interrupt loads PC
-    else if (branch_taken)  // Conditional branch taken or LOOP taken
-            pc_was_loaded <= 1'b1;
-        else if (opcode == 4'd11)  // JMP, CALL, RET, RTI
-            pc_was_loaded <= 1'b1;
-        else
-            pc_was_loaded <= 1'b0;
+    if (reset || intr)
+        pc_was_loaded <= 1'b1;
+    else if (pc_en && pc_load)
+        pc_was_loaded <= 1'b1;
+    else
+        pc_was_loaded <= 1'b0;
+end
+
+// counter for wait state
+always @(posedge clk) begin
+    if (reset || intr)
+    counter <= 2'b00;
+    else
+    if (state == S_WAIT)
+        counter <= counter + 1;
+    else
+        counter <= 2'b00;
 end
 
 always @(*) begin
@@ -58,7 +65,6 @@ always @(*) begin
     pc_src     = 2'b00;
     addr_src   = 2'b00;
     stall      = 0;
-    counter    = 2'b00;
     next_state = state;
 
     case (state)
@@ -109,16 +115,14 @@ always @(*) begin
     // ===== WAIT STATE FOR MEM OPS =====
     S_WAIT: begin
         // Simple 2-cycle wait for memory (for RET/RTI)
-        if (counter < 2'b10) begin
-            counter = counter + 1;
-            stall = 1;  // Stall Pipeline while waiting for memory
-            next_state = S_WAIT;
-        end
-        else  if (counter == 2'b10) begin
-            stall = 0;
-            counter = 2'b00;
-            next_state = S_BRANCH;
-        end
+    stall = 1'b1;
+    if (counter == 2'b10) begin
+        stall      = 1'b0;
+        next_state = S_BRANCH;
+    end
+    else begin
+        next_state = S_WAIT;
+    end
 
     end
 
@@ -129,24 +133,30 @@ always @(*) begin
                 pc_load = 1;
                 pc_en = 1;
                 pc_src  = 2'b00; // R[rb]ex
+                next_state = S_FETCH1;
             end
-
-        // ----- JMP / CALL -----
-        else if (opcode == 4'd11 && brx < 2) begin
-            wait(bypass_decode_done);
-            pc_load = 1;
-            pc_en = 1;
-            pc_src  = 2'b10; // R[rb]d
-        end
-
         // ----- RET / RTI -----
         else if (opcode == 4'd11 && brx >= 2) begin
             pc_load = 1;
             pc_en = 1;
             pc_src  = 2'b11; // data_out
+            next_state = S_FETCH1;
         end
-        next_state = S_FETCH1;
+        // ----- JMP / CALL -----
+        else if (opcode == 4'd11 && brx < 2) begin
+            if(bypass_decode_done) begin
+            pc_load = 1;
+            pc_en = 1;
+            pc_src  = 2'b10; // R[rb]d
+            next_state = S_FETCH1;
+            end
+            else begin // bypass not done, stall
+                stall = 1'b1;
+                next_state = S_BRANCH;
+            end
+        end
     end
+
 
     endcase
 end

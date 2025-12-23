@@ -21,6 +21,7 @@ module Ex_M_Latch (
     input clk,
     input reset,
     input ld,
+    input flush,
 
     // 1
     output reg [1:0]ra,
@@ -45,7 +46,7 @@ module Ex_M_Latch (
 
 
     always @(posedge clk or negedge reset) begin
-        if(!reset) begin
+        if(!reset || flush) begin
             // 1
             ra <= 2'b0;
             rb <= 2'b0;
