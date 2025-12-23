@@ -17,6 +17,8 @@ module Ex_M_Latch (
     input in_SM2,
     // 5
     input [7:0]in_res,
+    //6
+    input in_Hlt,
 
     input clk,
     input reset,
@@ -40,8 +42,9 @@ module Ex_M_Latch (
     output reg SM1,
     output reg SM2,
     // 5
-    output reg [7:0]res
-
+    output reg [7:0]res,
+    // 6
+    output reg Hlt
 );
 
 
@@ -64,7 +67,9 @@ module Ex_M_Latch (
             SM1 <= 1'b0;
             SM2 <= 1'b0;
             // 5
-            res <= 8'b0;            
+            res <= 8'b0;  
+            // 6
+            Hlt <= 1'b0;          
         end 
         else begin
             if (ld) begin                
@@ -86,6 +91,9 @@ module Ex_M_Latch (
                 SM2 <= in_SM2;
                 // 5
                 res <= in_res;
+                // 6
+                Hlt <= in_Hlt;
+
             end
         end 
     end

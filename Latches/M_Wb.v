@@ -1,4 +1,4 @@
-module Ex_M_Latch (
+module M_WB_Latch (
     // 1
     input [1:0]in_ra,
     input [1:0]in_rb,
@@ -10,6 +10,8 @@ module Ex_M_Latch (
     input in_out_ld,
     // 5
     input [7:0]in_DataOut,
+    //6
+    input in_Hlt,
 
     input clk,
     input reset,
@@ -26,8 +28,9 @@ module Ex_M_Latch (
     output reg SW2,
     output reg out_ld,
     // 5
-    output reg [7:0]DataOut
-
+    output reg [7:0]DataOut,
+    // 6
+    output reg Hlt
 );
 
 
@@ -44,6 +47,8 @@ module Ex_M_Latch (
             out_ld <= 1'b0;
             // 5
             DataOut <= 8'b0;
+            // 6
+            Hlt <= 1'b0;
         end
         else begin
             if (ld) begin                
@@ -57,7 +62,9 @@ module Ex_M_Latch (
                 SW2 <= in_SW2;
                 out_ld <= in_out_ld;
                 // 5
-                DataOut <= in_DataOut;    
+                DataOut <= in_DataOut;
+                // 6
+                Hlt <= in_Hlt;
             end
         end
     end
