@@ -1,4 +1,4 @@
-// ; code for test , edit this file and add your own code
+; code for test , edit this file and add your own code
 LDM R1, 3     
 LDM R2, 0       
 LDM R0, 0x08   
