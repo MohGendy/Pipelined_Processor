@@ -4,8 +4,8 @@ module Mem_CU (
     output reg SM2               //memory mux2 selection (0->ALU res,1-> D_data memory port)
 );
 
-reg [3:0] op_code ;
-reg [1:0] ra , rb ;
+wire [3:0] op_code ;
+wire [1:0] ra , rb ;
 
 assign op_code = IR[7:4] ;
 assign ra = IR[3:2] ; //or brx

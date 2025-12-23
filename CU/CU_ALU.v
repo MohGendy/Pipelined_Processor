@@ -5,8 +5,8 @@ module CU
   input wire [3:0] op_code ,
   input wire [1:0] ra , 
   input wire [1:0] rb ,
-  output reg SE1 , SE2 ,
-  output reg [1:0] SE3 , 
+  output reg  SE2 ,       //"1-> R[rb] , 0-> 1"
+  output reg [1:0] SE3 , //"0-> ALU_res , 1-> R[ra] , 2-> R[rb]"
   output reg [3:0] ALU_CONTROL
 );
 
@@ -14,7 +14,6 @@ always @ (*)
    begin
    //Default Values
    ALU_CONTROL = 4'b0000 ;
-   SE1 = 1'b0  ;
    SE2 = 1'b0  ;
    SE3 = 2'b00 ; //alu res
 
@@ -27,25 +26,21 @@ always @ (*)
 
       4'b0010 : begin //ADD
          ALU_CONTROL = 4'b0010;
-            SE1 = 1'b1  ;
             SE2 = 1'b1  ;
       end
 
       4'b0011 : begin //SUB
          ALU_CONTROL = 4'b0011;
-            SE1 = 1'b1  ;
             SE2 = 1'b1  ;
       end
 
       4'b0100 : begin // AND
          ALU_CONTROL = 4'b0100;
-            SE1 = 1'b1  ;
             SE2 = 1'b1  ;
          end
    
       4'b0101 : begin //OR
          ALU_CONTROL = 4'b0101;
-            SE1 = 1'b1  ;
             SE2 = 1'b1  ;
          end 
 
@@ -114,7 +109,6 @@ always @ (*)
      
      4'b1010 : begin //LOOP
       ALU_CONTROL = 4'b0011 ; //sub
-      SE1 = 1'b1 ; //R[ra]
       SE2 = 1'b0 ; // 1
      end
 
@@ -123,7 +117,7 @@ always @ (*)
       case (ra) 
             2'b01: begin //call
                ALU_CONTROL = 4'b0000; //NOP 
-               SE3 = 2'b01 ; //pass R[rb]
+               SE3 = 2'b01 ;         //pass SP
             end
             2'b10,2'b11: begin //RET,RTI
                ALU_CONTROL = 4'b0010; //add
@@ -137,12 +131,11 @@ always @ (*)
      end
 
      4'b1100,4'b1101,4'b1110: begin //LDM,LDD,STD,LDI,STI
-        SE3 = 2'b1 ; //pas IMM
+        SE3 = 2'b1 ; //pas IMM/R[ra]
      end
 
       default : begin 
          ALU_CONTROL = 4'b0000 ;
-         SE1 = 1'b0  ;
          SE2 = 1'b0  ;
          SE3 = 2'b00 ;
       end

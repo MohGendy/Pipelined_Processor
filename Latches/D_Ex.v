@@ -22,10 +22,13 @@ module D_Ex_Latch (
     input in_SE1,
     input in_SE2,
     input [1:0]in_SE3,
+    //6
+    input in_Hlt,
 
     input clk,
     input reset,
     input ld,
+    input flush,
 
     // 1
     output reg [1:0]ra,
@@ -49,13 +52,15 @@ module D_Ex_Latch (
     output reg [2:0]BU,
     output reg SE1,
     output reg SE2,
-    output reg [1:0]SE3
+    output reg [1:0]SE3,
+    // 6
+    output reg Hlt
 
 );
 
 
     always @(posedge clk or negedge reset) begin
-        if(!reset) begin
+        if(!reset || flush) begin
             // 1
             ra <= 2'b0;
             rb <= 2'b0;
@@ -79,6 +84,8 @@ module D_Ex_Latch (
             SE1 <= 1'b0;
             SE2 <= 1'b0;
             SE3 <= 2'b0;
+            // 6
+            Hlt <= 1'b0;
             
         end 
         else begin
@@ -106,6 +113,8 @@ module D_Ex_Latch (
                 SE1 <= in_SE1;
                 SE2 <= in_SE2;
                 SE3 <= in_SE3;
+                // 6
+                Hlt <= in_Hlt;
             end            
         end
     end
