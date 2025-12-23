@@ -6,14 +6,15 @@ module RegFile_ControlUnit (
     // Inputs from Instruction Register (IR)
     input wire [3:0] Opcode,     // IR[7:4]
     input wire [1:0] ra_brx,     // IR[3:2] (used for ra or brx field)
-    
+    input wire       sf1,        // registered interrupt flag
+
 
 
     // Outputs (Control Signals for MUXes)
     // MUX Logic: 0 = Default/Top input; 1 = Alternate/Bottom input
     output reg SD1,              // MUX 1: Write Address Selector (0=IR[ra], 1=3/SP)
     output reg SD2,              // MUX 2: Read A Selector (0= Immediate Value (Imm), 1=R[ra])
-    output reg SD3               // MUX 3: Read B Selector (0=R[rb], 1=PC+1)
+    output reg [1:0] SD3         // MUX 3: Read B Selector (0=R[rb], 1=PC+1, 2=IR)
 );
 
     // Opcodes Constants
@@ -39,61 +40,67 @@ module RegFile_ControlUnit (
         //? SD1 = 1'b0; 
         //? SD2 = 1'b1; 
         //? SD3 = 1'b0; 
+        if(sf1)begin
+            SD1 = 1'b1; 
+            SD2 = 1'b1; 
+            SD3 = 2'b10; 
+        end
+        else begin
+            case (Opcode)
+                
+                // PUSH/POP Instructions (Opcode 7)
+                OP_PUSH_POP: begin
+                    SD2 = 1'b1; 
+                    SD3 = 2'b0; 
+                    if (ra_brx == RA_PUSH) begin
+                        // PUSH R[rb]: Modifies SP (R3). User requested SD1=1 for SP operations.
+                        SD1 = 1'b1; // Select R3/SP address
+                    end else if (ra_brx == RA_POP) begin
+                        // POP R[rb]: Modifies SP (R3). User requested SD1=1 for SP operations.
+                        SD1 = 1'b1; // Select R3/SP address
+                    end else
+                        SD1 = 1'b0; //return to default
+                end
 
-        case (Opcode)
-            
-            // PUSH/POP Instructions (Opcode 7)
-            OP_PUSH_POP: begin
-                SD2 = 1'b1; 
-                SD3 = 1'b0; 
-                if (ra_brx == RA_PUSH) begin
-                    // PUSH R[rb]: Modifies SP (R3). User requested SD1=1 for SP operations.
-                    SD1 = 1'b1; // Select R3/SP address
-                end else if (ra_brx == RA_POP) begin
-                    // POP R[rb]: Modifies SP (R3). User requested SD1=1 for SP operations.
-                    SD1 = 1'b1; // Select R3/SP address
-                end else
-			        SD1 = 1'b0; //return to default
-            end
-
-            // LD/ST/I Instructions (Opcode 12)
-            OP_LD_ST_I: begin
-                // LDM Instruction (Opcode 12, ra=0). Function: R[rb] <- Imm. 
-                SD1 = 1'b0; 
-                SD2 = 1'b0; // Select Imm (0 according to your MUX definition)
-                SD3 = 1'b0; 
-            end
-            // CALL/JMP/RET/RTI Instructions (Opcode 11)
-            OP_CALL: begin
-                SD2 = 1'b1; 
-                case (ra_brx)
-                    BRX_CALL: begin
-                        // CALL: X[SP--] <- PC+1. Modifies SP (R3). Requires MUX 3 to select PC+1.
-                        SD1 = 1'b1; // Select R3/SP address (User request)
-                        SD3 = 1'b1; // Select PC+1
-                    end
-                    BRX_RET: begin
-                        // RET: PC <- X[++SP]. Modifies SP (R3).
-                        SD1 = 1'b1; // Select R3/SP address (User request)
-                        SD3 = 1'b0; // Select R[rb]
-                    end
-                    BRX_RTI: begin
-                        // RTI: PC <- X[++SP]. Modifies SP (R3).
-                        SD1 = 1'b1; // Select R3/SP address (User request)
-                        SD3 = 1'b0; // Select R[rb]
-                    end
-                    default: begin
-                        SD1 = 1'b0; 
-                        SD3 = 1'b0;
-                    end
-                endcase
-            end
-            default: begin
-                SD1 = 1'b0; 
-                SD2 = 1'b1; 
-                SD3 = 1'b0; 
-            end
-        endcase
+                // LD/ST/I Instructions (Opcode 12)
+                OP_LD_ST_I: begin
+                    // LDM Instruction (Opcode 12, ra=0). Function: R[rb] <- Imm. 
+                    SD1 = 1'b0; 
+                    SD2 = 1'b0; // Select Imm (0 according to your MUX definition)
+                    SD3 = 2'b0; 
+                end
+                // CALL/JMP/RET/RTI Instructions (Opcode 11)
+                OP_CALL: begin
+                    SD2 = 1'b1; 
+                    case (ra_brx)
+                        BRX_CALL: begin
+                            // CALL: X[SP--] <- PC+1. Modifies SP (R3). Requires MUX 3 to select PC+1.
+                            SD1 = 1'b1; // Select R3/SP address (User request)
+                            SD3 = 2'b1; // Select PC+1
+                        end
+                        BRX_RET: begin
+                            // RET: PC <- X[++SP]. Modifies SP (R3).
+                            SD1 = 1'b1; // Select R3/SP address (User request)
+                            SD3 = 2'b0; // Select R[rb]
+                        end
+                        BRX_RTI: begin
+                            // RTI: PC <- X[++SP]. Modifies SP (R3).
+                            SD1 = 1'b1; // Select R3/SP address (User request)
+                            SD3 = 2'b0; // Select R[rb]
+                        end
+                        default: begin
+                            SD1 = 1'b0; 
+                            SD3 = 2'b0;
+                        end
+                    endcase
+                end
+                default: begin
+                    SD1 = 1'b0; 
+                    SD2 = 1'b1; 
+                    SD3 = 1'b0; 
+                end
+            endcase            
+        end
         
     end
 

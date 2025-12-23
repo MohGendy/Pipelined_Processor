@@ -1,13 +1,19 @@
 module instruction_reg  (
     input  clk,rst, flush,
+    input  sf1_in,
     input  [7:0] ir_new,
+    output reg sf1,
     output reg [7:0] ir
 );
     always @(posedge clk or negedge rst) begin
-        if (!rst || flush)
+        if (!rst || flush) begin
             ir <= 0;
-        else
-            ir<= ir_new;
+            sf1<= 0;
+        end
+        else begin
+            ir <= ir_new;
+            sf1<= sf1_in;
+        end
     end
     
 endmodule

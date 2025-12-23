@@ -10,9 +10,11 @@ module PC_CU (
     output reg         pc_en,
     output reg         pc_load,
     output reg         stall,
+    output reg         sf1, // 0 always (inst data) , 1 Int (pc)
     output reg [1:0]   counter,
     output reg [1:0]   pc_src,
-    output reg [1:0]   addr_src    
+    output reg [1:0]   addr_src,
+    output reg         int_clr    
 );
 localparam    
     S_RESET_INTER = 3'd0,
@@ -67,6 +69,8 @@ always @(*) begin
     addr_src   = 2'b00;
     stall      = 0;
     next_state = state;
+    sf1        = 1'b0;
+    int_clr    = 1'b0;
 
     case (state)
     // ===== RESET OR INTERRUPT =====
@@ -79,10 +83,12 @@ always @(*) begin
             end
             else begin
        if (intr) begin
-            pc_en   = 1;
-            pc_load = 1;
-            pc_src  = 2'b01;   // I_out
+            pc_en    = 1;
+            pc_load  = 1;
+            pc_src   = 2'b01;   // I_out
             addr_src = 2'b10; // M[1]
+            sf1      = 1'b1;
+            int_clr  = 1'b1;
         end
             end
     if (!intr && !reset)  
