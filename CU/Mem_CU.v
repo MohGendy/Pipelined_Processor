@@ -1,7 +1,7 @@
 module Mem_CU (
     input [7:0] IR ,               //the 8bit instruction
     output reg Wm ,               //write memory control
-    output reg SM2               //memory mux2 selection
+    output reg SM2               //memory mux2 selection (0->ALU res,1-> D_data memory port)
 );
 
 reg [3:0] op_code ;
@@ -38,7 +38,7 @@ assign rb = IR[1:0] ;
     always @(*) begin
         case (op_code) 
             4'd7: begin //pop
-                if (ra == 2'd1) SM2 = 1'b1 ;
+                if (ra == 2'd1) SM2 = 1'b1 ; //D_data
                 else SM2 = 1'b0 ; 
             end 
             4'd11: begin 
@@ -53,7 +53,7 @@ assign rb = IR[1:0] ;
             4'd13: begin //LDI
                 SM2 = 1'b1 ;
             end
-            default: SM2 = 1'b0 ;
+            default: SM2 = 1'b0 ; //res
         endcase
     end
 

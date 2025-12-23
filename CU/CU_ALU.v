@@ -16,7 +16,7 @@ always @ (*)
    ALU_CONTROL = 4'b0000 ;
    SE1 = 1'b0  ;
    SE2 = 1'b0  ;
-   SE3 = 2'b00 ;
+   SE3 = 2'b00 ; //alu res
 
       case (op_code)
    
@@ -45,8 +45,8 @@ always @ (*)
    
       4'b0101 : begin //OR
          ALU_CONTROL = 4'b0101;
-            SE1 = 1'b0  ;
-            SE2 = 1'b0  ;
+            SE1 = 1'b1  ;
+            SE2 = 1'b1  ;
          end 
 
       4'b0110 : begin 
@@ -72,45 +72,72 @@ always @ (*)
 
       end 
       
-      4'b0111 : begin //POP
-         ALU_CONTROL = 4'b0010 ;
-         SE2 = 1'b0 ;
-
+      4'b0111 : begin 
+         SE2 = 1'b0 ; // add 1 
+         case (ra) 
+            2'b00: begin //push
+               ALU_CONTROL = 4'b0000; //NOP 
+               SE3 = 2'b01 ; //pass R[ra]
+            end
+            2'b01: begin //pop
+               ALU_CONTROL = 4'b0010; //add
+               SE3 = 2'b00 ; //pass alu res
+            end
+            2'b10: begin //out
+               ALU_CONTROL = 4'b0000; //NOP 
+               SE3 = 2'b10 ; //pass R[rb]
+            end
+            default: begin
+               ALU_CONTROL = 4'b0000; //NOP 
+               SE3 = 2'b00 ;
+            end
+         endcase
       end
 
       4'b1000 : begin 
+          SE2 = 1'b1  ; //pass R[rb]  
          case(ra)
             2'b00: begin  // NOT - 1's Complement
             ALU_CONTROL = 4'b1010 ; // ALU_CONTROL = op_code + ra + 2'b10
-               SE2 = 1'b1  ;   
             end
             2'b01: begin  // NEG - 2's Complement
             ALU_CONTROL = 4'b1011 ;
-               SE2 = 1'b1  ;
             end
             2'b10: begin  // INC - Increment
             ALU_CONTROL = 4'b1100 ;
-               SE2 = 1'b1  ;
             end
             2'b11: begin  // DEC - Decrement
-            ALU_CONTROL = 4'b1011 ;
-               SE2 = 1'b1  ;
+            ALU_CONTROL = 4'b1101 ;
             end
          endcase
       end
      
      4'b1010 : begin //LOOP
-      ALU_CONTROL = 4'b0011 ;
-      SE1 = 1'b1 ;
-      SE2 = 1'b0 ;
+      ALU_CONTROL = 4'b0011 ; //sub
+      SE1 = 1'b1 ; //R[ra]
+      SE2 = 1'b0 ; // 1
      end
 
      4'b1011 : begin 
-      if (ra == 2'b10 || ra = 2'b11 )//RET or RTI 
-      ALU_CONTROL = 4'b0010 ;
-      SE1 = 1'b1;
-      SE2 = 1'b0;
+      SE2 = 1'b0  ; //add 1 
+      case (ra) 
+            2'b01: begin //call
+               ALU_CONTROL = 4'b0000; //NOP 
+               SE3 = 2'b01 ; //pass R[rb]
+            end
+            2'b10,2'b11: begin //RET,RTI
+               ALU_CONTROL = 4'b0010; //add
+               SE3 = 2'b00 ; //pass alu res
+            end
+            default: begin
+               ALU_CONTROL = 4'b0000; //NOP 
+               SE3 = 2'b00 ;
+            end
+         endcase
+     end
 
+     4'b1100,4'b1101,4'b1110: begin //LDM,LDD,STD,LDI,STI
+        SE3 = 2'b1 ; //pas IMM
      end
 
       default : begin 
