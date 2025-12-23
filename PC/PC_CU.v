@@ -2,6 +2,7 @@ module PC_CU (
     input clk,
     input reset,
     input intr,
+    input stall_in,
     input   [3:0]  opcode,
     input   [1:0]  brx,
     input  branch_taken,
@@ -52,9 +53,9 @@ always @(posedge clk) begin
     if (reset || intr)
     counter <= 2'b00;
     else
-    if (state == S_WAIT)
+    if (state == S_WAIT &! stall_in)
         counter <= counter + 1;
-    else
+    else 
         counter <= 2'b00;
 end
 
@@ -70,20 +71,20 @@ always @(*) begin
     case (state)
     // ===== RESET OR INTERRUPT =====
     S_RESET_INTER: begin
-       if (intr) begin
-            pc_en   = 1;
-            pc_load = 1;
-            pc_src  = 2'b01;   // I_out
-            addr_src = 2'b10; // M[1]
-        end
-        else begin
             if (reset) begin
         pc_en   = 1;
         pc_load = 1;
         pc_src  = 2'b01;   // I_out
         addr_src = 2'b01; // M[0]
             end
+            else begin
+       if (intr) begin
+            pc_en   = 1;
+            pc_load = 1;
+            pc_src  = 2'b01;   // I_out
+            addr_src = 2'b10; // M[1]
         end
+            end
     if (!intr && !reset)  
         next_state = S_FETCH1;
         else 
