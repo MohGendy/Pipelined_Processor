@@ -14,7 +14,8 @@ module WB_CU_controls(
     output reg sp_dec,
 
     // out port ld signal
-    output reg ld_out
+    output reg ld_out,
+    output reg HLT_en,
 );
 
     always @(*) begin
@@ -24,6 +25,7 @@ module WB_CU_controls(
         sp_inc   = 1'b0;
         sp_dec   = 1'b0;
         ld_out   = 1'b0;
+        HLT_en   = 1'b0;
         
         case (opcode)
             // MOV, ADD, SUB, AND, OR, NOT/NEG/INC/DEC  (dest = ra)
@@ -104,6 +106,18 @@ module WB_CU_controls(
                 write_en = 1'b1;
                 sw1      = 1'b1;  // dest = rb
                 sw2      = 1'b0;
+            end
+            4'd15: begin //HLT  //! MISSING , logic to stop the CPU
+                HLT_en = 1'b1 ;
+            end
+            default: begin
+                write_en = 1'b0;
+                sw1      = 1'b0;
+                sw2      = 1'b0;
+                sp_inc   = 1'b0;
+                sp_dec   = 1'b0;
+                ld_out   = 1'b0;
+                HLT_en   = 1'b0;
             end
         endcase
     end
