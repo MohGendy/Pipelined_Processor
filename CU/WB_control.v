@@ -15,7 +15,7 @@ module WB_CU_controls(
 
     // out port ld signal
     output reg ld_out,
-    output reg HLT_en,
+    output reg HLT_en
 );
 
     always @(*) begin

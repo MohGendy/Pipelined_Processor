@@ -7,7 +7,7 @@ input rst,  // reset (active Low)
 input [7:0] in_port,                   // data in  
 output reg [7:0] out_port,            // data out
 input intr,                          // external interrupt  
-output reg HLT ,                    // output flag = 1 when hlt , and 0 otherwise      
+output reg HLT_flag ,                    // output flag = 1 when hlt , and 0 otherwise      
 /* INSIDE CPU ports interface */
 input out_en,                     // asserted when executing OUT instruction 
 input HLT_en,                    // signal from CU to rise hlt flag
