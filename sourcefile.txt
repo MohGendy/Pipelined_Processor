@@ -7,3 +7,4 @@ PC/*.v
 Pipeline/*.v
 Ports/*.v
 'Register File'/*.v
+TOP/*.v
