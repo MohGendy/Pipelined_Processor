@@ -1,10 +1,10 @@
 module Mux_2x1 (
     input wire SE1,SE2,
     input wire [7:0] A , B ,
-    output reg [7:0] OUT_1 , OUT_2
+    output [7:0] OUT_1 , OUT_2
 ); 
-    assign OUT_1 = SE1 ? A : 1'b0 ;
-    assign OUT_2 = SE2 ? B : 1'b1 ;
+    assign OUT_1 = SE1 ? A : 8'b0 ;
+    assign OUT_2 = SE2 ? B : 8'b1 ;
 endmodule
 
 module Mux_4x1 (

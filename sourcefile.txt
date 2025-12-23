@@ -1,0 +1,9 @@
+ALU/*.v
+CU/*.v
+Instruction_reg/*.v
+Latches/*.v
+Memory/*.v
+PC/*.v
+Pipeline/*.v
+Ports/*.v
+'Register File'/*.v

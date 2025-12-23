@@ -6,8 +6,8 @@ module Memory #(parameter Width = 256 ,addr_width = 8 , Depth = 8) (
     input [addr_width-1:0] D_addr ,       //data address
     input [Depth-1:0] Wdata ,            //write data 
     input WEn ,                         //write enable
-    output reg [Depth-1:0] I_data ,    //instruction 
-    output reg [Depth-1:0] D_data     //data 
+    output [Depth-1:0] I_data ,        //instruction 
+    output [Depth-1:0] D_data         //data 
 );
 
 reg [Depth-1:0] Mem [Width-1:0] ;
