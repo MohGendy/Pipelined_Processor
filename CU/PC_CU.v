@@ -16,12 +16,12 @@ module Fetch_Stage_CU (
     output reg [1:0]   addr_src,
     output reg         int_clr    
 );
-localparam    
-    S_RESET_INTER = 3'd0,
-    S_FETCH1 = 3'd1,
-    S_FETCH2 = 3'd2,
-    S_WAIT   = 3'd3,
-    S_BRANCH = 3'd4;
+
+localparam  S_RESET_INTER = 3'd0,
+            S_FETCH1 = 3'd1,
+            S_FETCH2 = 3'd2,
+            S_WAIT   = 3'd3,
+            S_BRANCH = 3'd4;
 
 reg [2:0] state, next_state;
 reg two_byte;
@@ -31,18 +31,16 @@ always @(*) begin
     two_byte = (opcode == 4'd12); // LDM, LDD, STD
 end
 
-always @(posedge clk) begin
-    if (intr)
-        state <= S_RESET_INTER;
-        else if (reset)
+always @(posedge clk or negedge reset) begin
+    if (intr || !reset)
         state <= S_RESET_INTER;
     else
         state <= next_state;
 end
 
 // Track if PC was loaded (for branches, jumps, etc.)
-always @(posedge clk) begin
-    if (reset || intr)
+always @(posedge clk or negedge reset) begin
+    if (!reset || intr)
         pc_was_loaded <= 1'b1;
     else if (pc_en && pc_load)
         pc_was_loaded <= 1'b1;
@@ -51,9 +49,9 @@ always @(posedge clk) begin
 end
 
 // counter for wait state
-always @(posedge clk) begin
-    if (reset || intr)
-    counter <= 2'b00;
+always @(posedge clk or negedge reset) begin
+    if (!reset || intr) 
+        counter <= 2'b00;
     else
     if (state == S_WAIT &! stall_in)
         counter <= counter + 1;
@@ -75,14 +73,13 @@ always @(*) begin
     case (state)
     // ===== RESET OR INTERRUPT =====
     S_RESET_INTER: begin
-            if (reset) begin
-        pc_en   = 1;
-        pc_load = 1;
-        pc_src  = 2'b01;   // I_out
-        addr_src = 2'b01; // M[0]
+        if (!reset) begin
+                pc_en   = 1;
+                pc_load = 1;
+                pc_src  = 2'b01;   // I_out
+                addr_src = 2'b01; // M[0]
             end
-            else begin
-       if (intr) begin
+        else if (intr) begin
             pc_en    = 1;
             pc_load  = 1;
             pc_src   = 2'b01;   // I_out
@@ -90,11 +87,11 @@ always @(*) begin
             sf1      = 1'b1;
             int_clr  = 1'b1;
         end
-            end
-    if (!intr && !reset)  
-        next_state = S_FETCH1;
+
+        if (!intr && reset)  
+            next_state = S_FETCH1;
         else 
-        next_state = S_RESET_INTER;
+            next_state = S_RESET_INTER;
     end
     // ===== FETCH =====
     S_FETCH1: begin
@@ -122,14 +119,14 @@ always @(*) begin
     // ===== WAIT STATE FOR MEM OPS =====
     S_WAIT: begin
         // Simple 2-cycle wait for memory (for RET/RTI)
-    stall = 1'b1;
-    if (counter == 2'b10) begin
-        stall      = 1'b0;
-        next_state = S_BRANCH;
-    end
-    else begin
-        next_state = S_WAIT;
-    end
+        stall = 1'b1;
+        if (counter == 2'b10) begin
+            stall      = 1'b0;
+            next_state = S_BRANCH;
+        end
+        else begin
+            next_state = S_WAIT;
+        end
 
     end
 
@@ -152,10 +149,10 @@ always @(*) begin
         // ----- JMP / CALL -----
         else if (opcode == 4'd11 && brx < 2) begin
             if(bypass_decode_done) begin
-            pc_load = 1;
-            pc_en = 1;
-            pc_src  = 2'b10; // R[rb]d
-            next_state = S_FETCH1;
+                pc_load = 1;
+                pc_en = 1;
+                pc_src  = 2'b10; // R[rb]d
+                next_state = S_FETCH1;
             end
             else begin // bypass not done, stall
                 stall = 1'b1;
@@ -164,6 +161,16 @@ always @(*) begin
         end
     end
 
+    default: begin
+        pc_en      = 0;
+        pc_load    = 0;
+        pc_src     = 2'b00;
+        addr_src   = 2'b00;
+        stall      = 0;
+        next_state = state;
+        sf1        = 1'b0;
+        int_clr    = 1'b0;
+    end
 
     endcase
 end
