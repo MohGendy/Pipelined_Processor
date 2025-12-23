@@ -1,4 +1,4 @@
-module WB_CU_controls(
+module Write_Back_Stage_CU(
 
     // instruction fields in WB stage
     input [3:0] opcode,

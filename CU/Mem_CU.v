@@ -1,4 +1,4 @@
-module Mem_CU (
+module Memory_Stage_CU (
     input [7:0] IR ,               //the 8bit instruction
     input wire  sf1,              //registered interrupt flag
     output reg Wm ,              //write memory control
