@@ -341,10 +341,11 @@ endtask
         check_PC(8'h03, "ADD INCREMENTS PC");
         wait_cycles(1);
 
-        wait_cycles(3);
-        check_register(2'b00, 8'h01, "ADD R0, R1 (255+2=1 & C_flag=1)");
+        wait_cycles(2);
         check_flag(2'b00, 1'b0, "ADD Z flag");
         check_flag(2'b10, 1'b1, "ADD C flag");
+        wait_cycles(1);
+        check_register(2'b00, 8'h01, "ADD R0, R1 (255+2=1 & C_flag=1)");
 
         // TEST 2: MOV 
         $display("\n--- TEST 2: MOV ---");
@@ -354,9 +355,9 @@ endtask
         
         // TEST 3: SUB 
         $display("\n--- TEST 3: SUB ---");
+        check_flag(2'b01, 1'b1, "SUB N flag");
         wait_cycles(1);
         check_register(2'b00, 8'hFF, "SUB R0, R1 (1-2=-1)");
-        check_flag(2'b01, 1'b1, "SUB N flag");
         
         // // TEST 4: AND 
         $display("\n--- TEST 4: AND ---");
