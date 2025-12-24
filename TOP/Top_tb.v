@@ -380,18 +380,19 @@ endtask
         wait_cycles(1);
         check_register(2'b10, 8'h02, "AND R0, R1 (2 & 2 = 2)");
 
+        uut.regFile.file[0] = 8'hAA;
+        uut.regFile.file[1] = 8'h02;
+        uut.regFile.file[2] = 8'h05;
+
         wait_cycles(4); //NOPs
         
         //TEST OR 
         $display("\n--- TEST 5: OR ---");
-        uut.regFile.file[1] = 8'h02;
-        uut.regFile.file[2] = 8'h05;
         wait_cycles(1);
-        check_register(2'b10, 8'h07, "OR R2, R1 (2 | 5 = 7)");
+        check_register(2'b10, 8'h07, "OR R2, R1 (5 | 2 = 7)");
 
         //TEST RLC
         $display("\n--- TEST 6: RLC ---");
-        uut.regFile.file[0] = 8'hAA; //10101010
         check_flag(2'b10, 1'b1, "RLC C flag (MSB was 1)");
         wait_cycles(1);
         check_register(2'b00, 8'h54, "RLC R0 (10101010 -> 01010100)");
@@ -399,10 +400,9 @@ endtask
 
         //TEST RRC
         $display("\n--- TEST 7: RRC ---");
-        uut.regFile.file[2] = 8'hAA; //10101010
-        check_flag(2'b10, 1'b0, "RRC C flag (LSB was 0)");
+        check_flag(2'b10, 1'b1, "RRC C flag (LSB was 1)");
         wait_cycles(1);
-        check_register(2'b10, 8'h55, "RRC R2 (10101010 -> 01010101)");
+        check_register(2'b10, 8'h03, "RRC R2 (00000111 -> 00000011)");
         
 
         //TEST SETC
@@ -418,9 +418,8 @@ endtask
 
         //TEST OUT
         $display("\n--- TEST 10: OUT ---");
-        uut.regFile.file[0] = 8'hAB;
         wait_cycles(1);
-        check_output_port(8'hAB, "OUT R0 sends 0xAB to Out_port");
+        check_output_port(8'h54, "OUT R0 sends 0x54 to Out_port");
 
         //TEST IN
         $display("\n--- TEST 11: IN ---");
@@ -431,12 +430,12 @@ endtask
         // TEST NOT
         $display("\n--- TEST 12: NOT ---");
         wait_cycles(1);
-        check_register(2'b10, 8'hAA, "NOT R2 ( ~(01010101) = 10101010 )");
+        check_register(2'b10, 8'hFC, "NOT R2 ( ~(00000011) = 11111100 )");
 
         // TEST NEG
         $display("\n--- TEST 13: NEG ---");
         wait_cycles(1);
-        check_register(2'b00, 8'h55, "NEG R0 (Two's complement of 0xAB = 0x55)");
+        check_register(2'b00, 8'hAC, "NEG R0 (Two's complement of 0x54 = 0xAC )");
 
         //TEST INC 
         $display("\n--- TEST 14: INC ---");
@@ -446,7 +445,7 @@ endtask
         //TEST DEC
         $display("\n--- TEST 15: DEC ---");
         wait_cycles(1);
-        check_register(2'b01, 8'hA9, "DEC R2 (AA-1=A9)");
+        check_register(2'b01, 8'hFB, "DEC R2 (FC-1=FB)");
 
          wait_cycles(5);
          print_summary();
