@@ -46,7 +46,7 @@ module top (
     wire SD2 ;
     wire [7:0] in_RD_A_D ;
 
-    wire SD3 ;
+    wire [1:0] SD3 ;
     wire [7:0] in_RD_B_D ;
 
     wire stall ;
@@ -260,10 +260,10 @@ module top (
         .RD_B    (RD_B     )
     );
 
-    mux_2to1 MD1( //:)
+    mux_2to1 #(.size(2)) MD1 ( //:)
         .sel (SD1     ),
         .in0 (IR[3:2] ),
-        .in1 (8'd3    ),
+        .in1 (2'd3    ),
         .out (RA_addr )
     );
 

@@ -1,10 +1,10 @@
-module mux_4to1 (
+module mux_4to1 #(parameter size = 8) (
     input  [1:0] sel,
-    input  [7:0] in0,
-    input  [7:0] in1,
-    input  [7:0] in2,
-    input  [7:0] in3,
-    output reg [7:0] out
+    input  [size-1:0] in0,
+    input  [size-1:0] in1,
+    input  [size-1:0] in2,
+    input  [size-1:0] in3,
+    output reg [size-1:0] out
 );
 always @(*) begin
     case (sel)

@@ -1,8 +1,8 @@
-module mux_2to1 (
+module mux_2to1 #(parameter size = 8) (
     input  sel,
-    input  [7:0] in0,
-    input  [7:0] in1,
-    output reg [7:0] out
+    input  [size-1:0] in0,
+    input  [size-1:0] in1,
+    output reg [size-1:0] out
 );
 always @(*) begin
     if (sel)

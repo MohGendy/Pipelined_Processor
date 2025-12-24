@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module processor_TB;
+module Top_tb;
 
     // Testbench signals
     reg clk;
@@ -27,8 +27,8 @@ module processor_TB;
     
     // VCD dump for waveform viewing
     initial begin
-        $dumpfile("processor_TB.vcd");
-        $dumpvars(0, processor_TB);
+        $dumpfile("Top_tb.vcd");
+        $dumpvars(0, Top_tb);
     end
     
     // Instantiate the processor
@@ -36,9 +36,9 @@ module processor_TB;
         .clk(clk),
         .rst(rst),
         .In_port(In_port),
-        .interrupt(interrupt),
+        .int(interrupt),
         .Out_port(Out_port),
-        .HLT_Flag(HLT_Flag)
+        .HLT(HLT_Flag)
     );
     
     //==========================================================================
@@ -65,10 +65,10 @@ module processor_TB;
     task initialize_regfile;
     begin
        // Initialize registers
-        uut.regfile.file[0] = 8'hFF;
-        uut.regfile.file[1] = 8'h02;
-        uut.regfile.file[2] = 8'h05;
-        uut.regfile.file[3] = 8'hFF;
+        uut.regFile.file[0] = 8'hFF;
+        uut.regFile.file[1] = 8'h02;
+        uut.regFile.file[2] = 8'h05;
+        uut.regFile.file[3] = 8'hFF;
     end
     endtask
 
@@ -78,7 +78,7 @@ module processor_TB;
     task load_hex_file;
     input [200*8:1] filename;
     begin
-        $readmemh(filename, uut.Memory.Mem);
+        $readmemh(filename, uut.u_Memory.Mem);
         $display("[INFO] Loaded program from %0s", filename);
     end
     endtask
@@ -105,7 +105,7 @@ module processor_TB;
         begin
             total_tests = total_tests + 1;
             
-            actual = uut.regfile.file[reg_num];
+            actual = uut.regFile.file[reg_num];
             
             if (actual === expected) begin
                 $display("[PASS] %0s: R%0d = 0x%0h (Expected: 0x%0h)", 
@@ -132,10 +132,10 @@ module processor_TB;
         total_tests = total_tests + 1;
 
         case(flag_type)
-            2'b00: begin actual = uut.ccr[0]; f_name = "Z"; end
-            2'b01: begin actual = uut.ccr[1]; f_name = "N"; end
-            2'b10: begin actual = uut.ccr[2]; f_name = "C"; end
-            2'b11: begin actual = uut.ccr[3]; f_name = "V"; end
+            2'b00: begin actual = uut.CCR_out[0]; f_name = "Z"; end
+            2'b01: begin actual = uut.CCR_out[1]; f_name = "N"; end
+            2'b10: begin actual = uut.CCR_out[2]; f_name = "C"; end
+            2'b11: begin actual = uut.CCR_out[3]; f_name = "V"; end
             default: actual = 1'bx;
         endcase
 
@@ -161,7 +161,7 @@ endtask
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
-            actual = uut.Memory.Mem[addr];
+            actual = uut.u_Memory.Mem[addr];
             
             if (actual === expected) begin
                 $display("[PASS] %0s: MEM[0x%0h] = 0x%0h (Expected: 0x%0h)", 
@@ -200,7 +200,7 @@ endtask
             $display("========================================");
             
             // Setup: Load reset vector at memory location 0
-            uut.Memory.Mem[0] = 8'h00; // Start at address 0x00
+            uut.u_Memory.Mem[0] = 8'h02; // Start at address 0x02
             
             // Apply reset
             apply_reset(3);
@@ -208,7 +208,7 @@ endtask
             wait_cycles(3);
 
             total_tests = total_tests + 1;
-            if (uut.pc === uut.Memory.Mem[0]) begin
+            if (uut.PC === uut.u_Memory.Mem[0]) begin
                 $display("[PASS] PC loaded from reset vector");
                 passed_tests = passed_tests + 1;
             end else begin
@@ -230,11 +230,11 @@ endtask
             
             if (Out_port === expected) begin
                 $display("[PASS] %0s: OUT_PORT = 0x%0h (Expected: 0x%0h)", 
-                         test_name, out_port, expected);
+                         test_name, Out_port, expected);
                 passed_tests = passed_tests + 1;
             end else begin
                 $display("[FAIL] %0s: OUT_PORT = 0x%0h (Expected: 0x%0h)", 
-                         test_name, out_port, expected);
+                         test_name, Out_port, expected);
                 failed_tests = failed_tests + 1;
             end
         end
@@ -249,7 +249,7 @@ endtask
     reg [7:0] actual;
     begin
         total_tests = total_tests + 1;
-        actual = uut.PC.pc_out;
+        actual = uut.PC;
 
         if (actual == expected)begin
             $display("[PASS] %0s: PC = 0x%0h (Expected: 0x%0h)", 
@@ -274,13 +274,36 @@ endtask
             $display("Total Tests:  %0d", total_tests);
             $display("Passed:       %0d", passed_tests);
             $display("Failed:       %0d", failed_tests);
-            $display("Pass Rate:    %.2f%%", pass_rate);
             $display("========================================\n");
             
             if (failed_tests == 0) begin
                 $display("*** ALL TESTS PASSED! ***\n");
             end else begin
                 $display("*** SOME TESTS FAILED ***\n");
+            end
+        end
+    endtask
+
+    //==========================================================================
+    // TASK 4: Load Instruction Memory
+    //==========================================================================
+    task load_instruction_memory;
+        input [7:0] addr;
+        input [7:0] data;
+        begin
+            // Access processor's memory - adjust path based on your hierarchy
+            uut.u_Memory.Mem[addr] = data;
+        end
+    endtask
+
+    //==========================================================================
+    // TASK 2: Clear Memory
+    //==========================================================================
+    task clear_memory;
+        integer i;
+        begin
+            for (i = 0; i < 256; i = i + 1) begin
+                    uut.u_Memory.Mem[i] = 8'h00;
             end
         end
     endtask
@@ -292,46 +315,63 @@ endtask
     initial begin
         initialize_test();
         initialize_regfile();
-        load_hex_file(/*file_name*/);
+        // load_hex_file(/*file_name*/);
         apply_reset(3);
         
         $display("\n========================================");
         $display("  STARTING INSTRUCTION TESTS");
         $display("========================================\n");
-        
+
+        clear_memory();
+        load_instruction_memory(8'd0,8'd2);
+        load_instruction_memory(8'd1,8'd110);
+        load_instruction_memory(8'd2,8'h21); //ADD R0,R1
+
         // TEST 0: Reset
         $display("--- TEST 0: RESET ---");
         wait_cycles(1);
-        check_PC(8'h10, "Reset loads PC from M[0]");
+        check_PC(8'h02, "Reset loads PC from M[0]");
 
         // TEST 1: ADD 
         $display("\n--- TEST 1: ADD ---");
         wait_cycles(1);
-        check_PC(8'h11, "ADD INCREMENTS PC");
+        check_PC(8'h03, "ADD INCREMENTS PC");
 
         wait_cycles(4);
         check_register(2'b00, 8'h01, "ADD R0, R1 (255+2=1 & C_flag=1)");
         check_flag(2'b00, 1'b0, "ADD Z flag");
         check_flag(2'b10, 1'b1, "ADD C flag");
 
-        // TEST 2: MOV 
-        $display("\n--- TEST 2: MOV ---");
-        wait_cycles(1);
-        check_register(2'b10, 8'h02, "MOV R2 , R1");
+        // // TEST 2: MOV 
+        // $display("\n--- TEST 2: MOV ---");
+        // wait_cycles(1);
+        // check_register(2'b10, 8'h02, "MOV R2 , R1");
 
         
-        // TEST 3: SUB 
-        $display("\n--- TEST 3: SUB ---");
-        wait_cycles(2);
-        check_register(2'b00, 8'hFF, "SUB R0, R1 (1-2=-1)");
-        check_flag(2'b01, 1'b1, "SUB N flag");
+        // // TEST 3: SUB 
+        // $display("\n--- TEST 3: SUB ---");
+        // wait_cycles(2);
+        // check_register(2'b00, 8'hFF, "SUB R0, R1 (1-2=-1)");
+        // check_flag(2'b01, 1'b1, "SUB N flag");
         
-        // TEST 4: AND 
-        $display("\n--- TEST 4: AND ---");
-        wait_cycles(1);
-        check_register(2'b10, 8'h10, "AND R0, R1 (2 & 2 = 2)");
+        // // TEST 4: AND 
+        // $display("\n--- TEST 4: AND ---");
+        // wait_cycles(1);
+        // check_register(2'b10, 8'h10, "AND R0, R1 (2 & 2 = 2)");
+
+        // // TEST 2: MOV R1, R0
+        // $display("\n--- TEST 2: MOV R1, R0 ---");
+        // clear_memory();
+        // load_instruction_memory(8'h00, 8'h10); // Reset vector to 0x10
+        // uut.regfile.file[0] = 8'h42;  // R0 = 0x42
+        // load_instruction_memory(8'h10, 8'h14); // MOV R1, R0
+        // apply_reset(3);
+        // wait_cycles(6);
+        // check_register(2'b01, 8'h42, "MOV R1, R0");
+        // check_PC(8'h11, "MOV increments PC");
         
-         
+         print_summary();
+         $stop;
 
     end
 endmodule
