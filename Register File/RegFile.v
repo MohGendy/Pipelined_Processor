@@ -39,17 +39,8 @@ end
 // Write and SP Update Logic (Synchronous Write)
 
 always @(negedge clk) begin
-    // 1. Standard Register Write (from WB stage)
-    if (WE) begin
-        // Perform the standard write if WE is asserted (Writing ALU result, or Data from Memory)
-        file[RW_addr] <= WD;
-    end
-    
-    // 2. Stack Pointer (R3) Increment/Decrement Logic
-    // R3 (file[3]) is the Stack Pointer (SP)
     
     // Priority: If both IncSP and DecSP are asserted (which shouldn't happen), DecSP has priority.
-    
     if (DecSP) begin
         // SP-- (Used by PUSH, CALL, Interrupt)
         // R3 value <- R3 value - 1
@@ -61,6 +52,17 @@ always @(negedge clk) begin
         // R3 value <- R3 value + 1
         file[3] <= file[3] + 1; 
     end
+
+    // 1. Standard Register Write (from WB stage)
+    if (WE) begin
+        // Perform the standard write if WE is asserted (Writing ALU result, or Data from Memory)
+        file[RW_addr] <= WD;
+    end
+    
+    // 2. Stack Pointer (R3) Increment/Decrement Logic
+    // R3 (file[3]) is the Stack Pointer (SP)
+    
+    
 end
 
 endmodule
