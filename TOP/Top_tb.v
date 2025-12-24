@@ -320,17 +320,21 @@ endtask
         load_instruction_memory(8'd3,8'h19);  //MOV R2,R1
         load_instruction_memory(8'd4,8'h31);  //SUB R0,R1
         load_instruction_memory(8'd5,8'h49);  //AND R2,R1
-        load_instruction_memory(8'd6,8'h59);  //OR R2,R1
-        load_instruction_memory(8'd7,8'h60);  //RLC R0
-        load_instruction_memory(8'd8,8'h66);  //RRC R2  
-        load_instruction_memory(8'd9,8'h68);  //SETC 1000
-        load_instruction_memory(8'd10,8'h6C); //CLRC 1100
-        load_instruction_memory(8'd11,8'h78); //OUT R0 1000
-        load_instruction_memory(8'd12,8'h7D); //IN R1 1101
-        load_instruction_memory(8'd13,8'h82); //NOT R2  0010
-        load_instruction_memory(8'd14,8'h84); //NEG R0  0100
-        load_instruction_memory(8'd15,8'h89); //INC R1  1001
-        load_instruction_memory(8'd16,8'h8E); //DEC R2  1110
+        load_instruction_memory(8'd6,8'h00);  //NOP
+        load_instruction_memory(8'd7,8'h00);  //NOP
+        load_instruction_memory(8'd8,8'h00);  //NOP
+        load_instruction_memory(8'd9,8'h00);  //NOP
+        load_instruction_memory(8'd10,8'h59);  //OR R2,R1
+        load_instruction_memory(8'd11,8'h60);  //RLC R0
+        load_instruction_memory(8'd12,8'h66);  //RRC R2  
+        load_instruction_memory(8'd13,8'h68);  //SETC 1000
+        load_instruction_memory(8'd14,8'h6C); //CLRC 1100
+        load_instruction_memory(8'd15,8'h78); //OUT R0 1000
+        load_instruction_memory(8'd16,8'h7D); //IN R1 1101
+        load_instruction_memory(8'd17,8'h82); //NOT R2  0010
+        load_instruction_memory(8'd18,8'h84); //NEG R0  0100
+        load_instruction_memory(8'd19,8'h89); //INC R1  1001
+        load_instruction_memory(8'd20,8'h8E); //DEC R2  1110
 
         initialize_test();
         initialize_regfile();
@@ -375,6 +379,8 @@ endtask
         $display("\n--- TEST 4: AND ---");
         wait_cycles(1);
         check_register(2'b10, 8'h02, "AND R0, R1 (2 & 2 = 2)");
+
+        wait_cycles(4); //NOPs
         
         //TEST OR 
         $display("\n--- TEST 5: OR ---");
