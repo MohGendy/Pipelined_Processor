@@ -9,50 +9,50 @@ module Control_Unit (
     input bypass_decode_done, //signal from hazard unit
 
 //Branch unit CU signls
-    output reg  [2:0] bu_op ,  // Output to Branch Unit
+    output wire [2:0] bu_op ,  // Output to Branch Unit
 
 //ALU CU signals
-    output reg  SE2 ,       //"0-> R[rb] , 1-> 1"
-    output reg [1:0] SE3 , //"0-> ALU_res , 1-> R[ra] , 2-> R[rb]"
-    output reg [3:0] ALU_CONTROL ,
+    output wire  SE2 ,       //"0-> R[rb] , 1-> 1"
+    output wire [1:0] SE3 , //"0-> ALU_res , 1-> R[ra] , 2-> R[rb]"
+    output wire [3:0] ALU_CONTROL ,
 
 //CCR CU signals
-    output reg Z_Flag_en ,
-    output reg N_Flag_en , 
-    output reg C_Flag_en ,
-    output reg V_Flag_en ,
+    output wire Z_Flag_en ,
+    output wire N_Flag_en , 
+    output wire C_Flag_en ,
+    output wire V_Flag_en ,
 
 //Reg file Decode signals
-    output reg SD1 ,              // MUX 1: Write Address Selector (0=IR[ra], 1=3/SP)
-    output reg SD2 ,             // MUX 2: Read A Selector (0= Immediate Value (Imm), 1=R[ra])
-    output reg [1:0] SD3 ,      // MUX 3: Read B Selector (0=R[rb], 1=PC+1, 2=IR)
+    output wire SD1 ,              // MUX 1: Write Address Selector (0=IR[ra], 1=3/SP)
+    output wire SD2 ,             // MUX 2: Read A Selector (0= Immediate Value (Imm), 1=R[ra])
+    output wire [1:0] SD3 ,      // MUX 3: Read B Selector (0=R[rb], 1=PC+1, 2=IR)
 
 //Mem CU signals
-    output reg Wm ,              //write memory control
-    output reg SM2 ,            //memory mux2 selection (0->ALU res,1-> D_data memory port)
+    output wire Wm ,              //write memory control
+    output wire SM2 ,            //memory mux2 selection (0->ALU res,1-> D_data memory port)
 
 //Reg file Write Back signals 
     // RF write address/data selects
-    output reg write_en,
-    output reg sw1,         // 0 -> write ra, 1 -> write rb
-    output reg sw2,        // 0 -> use wb_data, 1 -> force data_in
+    output wire write_en,
+    output wire sw1,         // 0 -> write ra, 1 -> write rb
+    output wire sw2,        // 0 -> use wb_data, 1 -> force data_in
 
     // stack pointer controls (R3)
-    output reg sp_inc,
-    output reg sp_dec,
+    output wire sp_inc,
+    output wire sp_dec,
 
     // out port ld signal
-    output reg ld_out,
-    output reg HLT_en,
+    output wire ld_out,
+    output wire HLT_en,
 
 //PC CU signals 
-    output reg         pc_en,
-    output reg         pc_load,
-    output reg         stall,
-    output reg         sf1, // 0 always (inst data) , 1 Int (pc) //output to IR reg
-    output reg [1:0]   pc_src,
-    output reg [1:0]   addr_src,
-    output reg         int_clr,
+    output wire         pc_en,
+    output wire         pc_load,
+    output wire         stall,
+    output wire         sf1, // 0 always (inst data) , 1 Int (pc) //output to IR wire
+    output wire [1:0]   pc_src,
+    output wire [1:0]   addr_src,
+    output wire         int_clr,
 
     output reg         Int_en  
 );

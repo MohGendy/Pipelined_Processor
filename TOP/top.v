@@ -12,7 +12,6 @@ module top (
 //? fetch
 
     wire [1:0] pc_src    ;
-    wire [7:0] data_out  ;
     wire [7:0] reg_rb_d  ;
     wire [7:0] I_data    ;
     wire [7:0] pc_in     ;
@@ -97,10 +96,10 @@ module top (
     
 //? Excute 
 
-    wire SHA;
+    wire [1:0] SHA;
     wire [7:0] RD_A_Ex;
 
-    wire SHB;
+    wire [1:0] SHB;
     wire [7:0] RD_B_Ex;
 
 
@@ -174,8 +173,7 @@ module top (
     assign in_SP    = {sp_inc,sp_dec};
     assign flags_en = {Int_en,Z_Flag_en,N_Flag_en,C_Flag_en,V_Flag_en};
     assign flush_IR = flush || stall_CU; //! yet to add decode branching Gemyy
-    assign ba       = flush;
-
+    assign reg_rb_d = RD_B; //! output of bypass decode
     //latches flush/ load
         assign ld_M_Wb    = 1'b1 ;
         assign flush_M_Wb = 1'b0 ;
@@ -184,7 +182,7 @@ module top (
         assign flush_Ex_M = stall ; //stall from hazard unit
 
         assign ld_D_Ex    = !stall ; //stall from hazard unit 
-        assign flush_D_Ex = (!stall) & (flush || 1'b1) ; //! or with the flush signal from decode bypass unit not 1'b1
+        assign flush_D_Ex = (!stall) & (flush || 1'b0) ; //! or with the flush signal from decode bypass unit not 1'b0
 
         assign ld_IR      = (!stall) & (! 1'b0) ;  //! not 1'b0 it is stall from bypass decode unit
         assign flush_IR   = (!stall ) & flush   ; 
@@ -530,7 +528,7 @@ module top (
 
 //? Write back
 
-    mux_2to1 MW1( //:)
+    mux_2to1 #(.size(2)) MW1( //:)
         .sel (SW1_Wb  ),
         .in0 (ra_Wb   ),
         .in1 (rb_Wb   ),

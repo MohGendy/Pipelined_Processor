@@ -49,10 +49,10 @@ module Top_tb;
             passed_tests = 0;
             failed_tests = 0;
             total_tests = 0;
-            rst = 0;
+            rst = 1;
             In_port = 8'h00;
             interrupt = 0;
-            
+            wait_cycles(2);
             $display("\n========================================");
             $display("  PROCESSOR TESTBENCH STARTED");
             $display("========================================\n");
@@ -183,7 +183,7 @@ endtask
         begin
             $display("[%0t] Applying Reset for %0d cycles...", $time, cycles);
             rst = 0;
-            repeat(cycles) @(posedge clk);
+            repeat(cycles) @(negedge clk);
             rst = 1;
             @(posedge clk);
             $display("[%0t] Reset Released", $time);
@@ -313,6 +313,14 @@ endtask
     // MAIN TEST SEQUENCE
     //==========================================================================
     initial begin
+        clear_memory();
+        load_instruction_memory(8'd0,8'd2);
+        load_instruction_memory(8'd1,8'd110);
+        load_instruction_memory(8'd2,8'h21); //ADD R0,R1
+        load_instruction_memory(8'd3,8'h19); //MOV R2,R1
+        load_instruction_memory(8'd4,8'h31); //SUB R0,R1
+        load_instruction_memory(8'd5,8'h49); //AND R2,R1
+
         initialize_test();
         initialize_regfile();
         // load_hex_file(/*file_name*/);
@@ -322,42 +330,38 @@ endtask
         $display("  STARTING INSTRUCTION TESTS");
         $display("========================================\n");
 
-        clear_memory();
-        load_instruction_memory(8'd0,8'd2);
-        load_instruction_memory(8'd1,8'd110);
-        load_instruction_memory(8'd2,8'h21); //ADD R0,R1
 
         // TEST 0: Reset
         $display("--- TEST 0: RESET ---");
-        wait_cycles(1);
         check_PC(8'h02, "Reset loads PC from M[0]");
+        wait_cycles(1);
 
         // TEST 1: ADD 
         $display("\n--- TEST 1: ADD ---");
-        wait_cycles(1);
         check_PC(8'h03, "ADD INCREMENTS PC");
+        wait_cycles(1);
 
-        wait_cycles(4);
+        wait_cycles(3);
         check_register(2'b00, 8'h01, "ADD R0, R1 (255+2=1 & C_flag=1)");
         check_flag(2'b00, 1'b0, "ADD Z flag");
         check_flag(2'b10, 1'b1, "ADD C flag");
 
-        // // TEST 2: MOV 
-        // $display("\n--- TEST 2: MOV ---");
-        // wait_cycles(1);
-        // check_register(2'b10, 8'h02, "MOV R2 , R1");
+        // TEST 2: MOV 
+        $display("\n--- TEST 2: MOV ---");
+        wait_cycles(1);
+        check_register(2'b10, 8'h02, "MOV R2 , R1");
 
         
-        // // TEST 3: SUB 
-        // $display("\n--- TEST 3: SUB ---");
-        // wait_cycles(2);
-        // check_register(2'b00, 8'hFF, "SUB R0, R1 (1-2=-1)");
-        // check_flag(2'b01, 1'b1, "SUB N flag");
+        // TEST 3: SUB 
+        $display("\n--- TEST 3: SUB ---");
+        wait_cycles(1);
+        check_register(2'b00, 8'hFF, "SUB R0, R1 (1-2=-1)");
+        check_flag(2'b01, 1'b1, "SUB N flag");
         
         // // TEST 4: AND 
-        // $display("\n--- TEST 4: AND ---");
-        // wait_cycles(1);
-        // check_register(2'b10, 8'h10, "AND R0, R1 (2 & 2 = 2)");
+        $display("\n--- TEST 4: AND ---");
+        wait_cycles(1);
+        check_register(2'b10, 8'h02, "AND R0, R1 (2 & 2 = 2)");
 
         // // TEST 2: MOV R1, R0
         // $display("\n--- TEST 2: MOV R1, R0 ---");
@@ -370,6 +374,7 @@ endtask
         // check_register(2'b01, 8'h42, "MOV R1, R0");
         // check_PC(8'h11, "MOV increments PC");
         
+         wait_cycles(5);
          print_summary();
          $stop;
 

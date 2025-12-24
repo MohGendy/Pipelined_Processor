@@ -75,14 +75,13 @@ always @(*) begin
     case (state)
     // ===== RESET OR INTERRUPT =====
     S_RESET_INTER: begin
+        pc_en   = 1;
         if (!reset) begin
-                pc_en   = 1;
                 pc_load = 1;
                 pc_src  = 2'b01;   // I_out
                 addr_src = 2'b01; // M[0]
             end
         else if (intr) begin
-            pc_en    = 1;
             pc_load  = 1;
             pc_src   = 2'b01;   // I_out
             addr_src = 2'b10; // M[1]
