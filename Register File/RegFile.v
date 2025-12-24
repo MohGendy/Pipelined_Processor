@@ -38,7 +38,7 @@ end
 // ----------------------------------------------------------------------
 // Write and SP Update Logic (Synchronous Write)
 
-always @(posedge clk) begin
+always @(negedge clk) begin
     // 1. Standard Register Write (from WB stage)
     if (WE) begin
         // Perform the standard write if WE is asserted (Writing ALU result, or Data from Memory)
