@@ -341,7 +341,7 @@ endtask
         check_PC(8'h03, "ADD INCREMENTS PC");
         wait_cycles(1);
 
-        wait_cycles(2);
+        wait_cycles(1);
         check_flag(2'b00, 1'b0, "ADD Z flag");
         check_flag(2'b10, 1'b1, "ADD C flag");
         wait_cycles(1);
@@ -359,7 +359,7 @@ endtask
         wait_cycles(1);
         check_register(2'b00, 8'hFF, "SUB R0, R1 (1-2=-1)");
         
-        // // TEST 4: AND 
+        // TEST 4: AND 
         $display("\n--- TEST 4: AND ---");
         wait_cycles(1);
         check_register(2'b10, 8'h02, "AND R0, R1 (2 & 2 = 2)");
