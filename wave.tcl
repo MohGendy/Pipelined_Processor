@@ -330,6 +330,8 @@ add wave -noupdate -expand -group Decode /Top_tb/uut/Int_en
 add wave -noupdate -expand -group Decode /Top_tb/uut/ALU_CONTROL
 add wave -noupdate -expand -group Decode /Top_tb/uut/SE2
 add wave -noupdate -expand -group Decode /Top_tb/uut/SE3
+add wave -noupdate -expand -group Decode /Top_tb/uut/stall_d
+add wave -noupdate -expand -group Decode /Top_tb/uut/SHD
 add wave -noupdate -divider {D to Ex latch}
 add wave -noupdate -expand -group D_EX_latch /Top_tb/uut/ld_D_Ex
 add wave -noupdate -expand -group D_EX_latch /Top_tb/uut/flush_D_Ex

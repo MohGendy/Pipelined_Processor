@@ -331,7 +331,7 @@ endtask
         load_instruction_memory(8'd14,8'h6C); //CLRC 1100
         load_instruction_memory(8'd15,8'h78); //OUT R0 1000
         load_instruction_memory(8'd16,8'h7D); //IN R1 1101
-        load_instruction_memory(8'd17,8'h82); //NOT R2  0010
+        load_instruction_memory(8'd17,8'h81); //NOT R1  0010
         load_instruction_memory(8'd18,8'h84); //NEG R0  0100
         load_instruction_memory(8'd19,8'h89); //INC R1  1001
         load_instruction_memory(8'd20,8'h8E); //DEC R2  1110
@@ -429,8 +429,8 @@ endtask
 
         // TEST NOT
         $display("\n--- TEST 12: NOT ---");
-        wait_cycles(1);
-        check_register(2'b10, 8'h7C, "NOT R2 ( ~(10000011) = 01111100 )");
+        wait_cycles(2);
+        check_register(2'b01, 8'h32, "NOT R1 ( ~(11001101) = 00110010 )");
 
         // TEST NEG
         $display("\n--- TEST 13: NEG ---");
@@ -440,12 +440,12 @@ endtask
         //TEST INC 
         $display("\n--- TEST 14: INC ---");
         wait_cycles(1);
-        check_register(2'b01, 8'hCE, "INC R1 (CD+1=CE)");
+        check_register(2'b01, 8'h33, "INC R1 (32+1=33)");
 
         //TEST DEC
         $display("\n--- TEST 15: DEC ---");
         wait_cycles(1);
-        check_register(2'b10, 8'h7B, "DEC R2 (7C-1=7B)");
+        check_register(2'b10, 8'h82, "DEC R2 (83-1=82)");
 
         wait_cycles(5);
         print_summary();

@@ -19,6 +19,7 @@ module top (
     wire pc_load  ;
     wire pc_en    ;
     wire [7:0] PC ;
+    wire PC_en_assigned  ;
 
     wire [1:0] addr_src ;
     wire [7:0] I_addr   ;
@@ -26,7 +27,7 @@ module top (
     wire sf1     ;
     wire [7:0] MF1_out ;
 
-    wire flush_IR  ; //!
+    wire flush_IR  ;
     wire reg_sf1   ;
     wire [7:0] IR  ;
     wire ld_IR     ;
@@ -49,6 +50,8 @@ module top (
     wire [7:0] in_RD_B_D ;
 
     wire stall ;
+
+    wire stall_d ;
 
 //! CU
 
@@ -93,6 +96,8 @@ module top (
     wire SE2_Ex     ;
     wire [1:0] SE3_Ex     ;
     wire Hlt_en_Ex        ;
+
+    wire [1:0] SHD;
     
 //? Excute 
 
@@ -172,8 +177,8 @@ module top (
     assign flags_in = {Overflow,Carry_Flag_OUT,Negative_Flag,Zero_Flag};
     assign in_SP    = {sp_inc,sp_dec};
     assign flags_en = {Int_en,Z_Flag_en,N_Flag_en,C_Flag_en,V_Flag_en};
-    assign flush_IR = flush || stall_CU; //! yet to add decode branching Gemyy
-    assign reg_rb_d = RD_B; //! output of bypass decode
+    // assign flush_IR = flush || stall_CU; //! yet to add decode branching Gemyy
+    // assign reg_rb_d = RD_B; //! output of bypass decode
     //latches flush/ load
         assign ld_M_Wb    = 1'b1 ;
         assign flush_M_Wb = 1'b0 ;
@@ -182,19 +187,19 @@ module top (
         assign flush_Ex_M = stall ; //stall from hazard unit
 
         assign ld_D_Ex    = !stall ; //stall from hazard unit 
-        assign flush_D_Ex = (!stall) & (flush || 1'b0) ; //! or with the flush signal from decode bypass unit not 1'b0
+        assign flush_D_Ex = (!stall) & (flush || stall_d) ;
 
-        assign ld_IR      = (!stall) & (! 1'b0) ;  //! not 1'b0 it is stall from bypass decode unit
-        assign flush_IR   = (!stall ) & flush   ; 
+        assign ld_IR      = (!stall) & (! stall_d) ;
+        assign flush_IR   = (!stall ) & (flush || stall_CU)   ;
 
-        assign bypass_decode_done = 1'b1 ;  //!should be from decode bypass unit
-
+        assign bypass_decode_done = ~stall_d ; 
+        assign PC_en_assigned = pc_en & ~stall & ~stall_d;
 //! modules instantiation
 //? fetch
     pc_in_mux u_pc_in_mux( //:)
         .pc_src    (pc_src    ),
         .data_out  (D_data    ), 
-        .reg_rb_d  (reg_rb_d  ), //! Gemyy
+        .reg_rb_d  (reg_rb_d  ),
         .I_out     (I_data    ), 
         .reg_rb_ex (RD_B_Ex   ),
         .pc_in     (pc_in     )
@@ -203,7 +208,7 @@ module top (
     PC u_PC( //:)
         .clk     (clk     ),
         .pc_load (pc_load ),
-        .pc_en   (pc_en   ),
+        .pc_en   (PC_en_assigned ),
         .pc_in   (pc_in   ),
         .pc_out  (PC      )
     );
@@ -283,7 +288,7 @@ module top (
 
 //! CU
 
-    Control_Unit u_Control_Unit( //! 1
+    Control_Unit u_Control_Unit(
         .clk                (clk                ),
         .rst                (rst                ),
         .IR                 (IR                 ),
@@ -291,7 +296,7 @@ module top (
         .intr               (intr_in            ),
         .stall_in           (stall              ),
         .branch_taken       (flush              ),
-        .bypass_decode_done (bypass_decode_done ), //! Gemyy
+        .bypass_decode_done (bypass_decode_done ), 
         
         .bu_op              (bu_op              ),
         .SE2                (SE2                ),
@@ -367,9 +372,32 @@ module top (
         .Hlt       (Hlt_en_Ex    )
     );
 
-//! bypass \Gemyy
-
-
+    bypass_jmp u_bypass_jmp(
+        .IR      (IR      ),
+        .we_Ex   (RW_Ex   ),
+        .sw1_Ex  (SW1_Ex  ),
+        .ra_Ex   (ra_Ex   ),
+        .rb_Ex   (rb_Ex   ),
+        .sm2_Ex  (SM2_Ex  ),
+        .sw2_Ex  (SW2_Ex  ),
+        .we_mem  (RW_M    ),
+        .sw1_mem (SW1_M   ),
+        .ra_mem  (ra_M    ),
+        .rb_mem  (rb_M    ),
+        .sw2_mem (SW2_M   ),
+        .stall_d (stall_d ),
+        .SHD     (SHD     )
+    );
+    
+    mux_4to1 MHD(
+        .sel (SHD ),
+        .in0 (RD_B),
+        .in1 (Res_EX ),
+        .in2 (DataOut ),
+        .in3 (8'b0 ),
+        .out (reg_rb_d )
+    );
+    
 //? Excute
 
     mux_4to1 MHA(//:)
@@ -557,7 +585,6 @@ module top (
             .data_to_cpu    (data_to_cpu    ),
             .intr_flag      (intr_in        )
         );
-
 
 
 
