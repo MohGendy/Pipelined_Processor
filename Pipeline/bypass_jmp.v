@@ -28,7 +28,7 @@ module bypass_jmp(
     assign hazard_wb  = we_wb && (dest_wb  == rb_ex);
 
     always @(*) begin
-	flush = jmp_or_call && (hazard_mem || hazard_wb);
+	    flush = jmp_or_call && (hazard_mem || hazard_wb);
     end
 
 endmodule

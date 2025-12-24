@@ -43,10 +43,14 @@ module Write_Back_Stage_CU(
                 4'd2,
                 4'd3,
                 4'd4,
-                4'd5,
-                4'd8: begin
+                4'd5: begin
                     write_en = 1'b1;
                     sw1      = 1'b0;  // write ra
+                    sw2      = 1'b0;  // normal WB data
+                end
+                4'd8: begin
+                    write_en = 1'b1;
+                    sw1      = 1'b1;  // write ra
                     sw2      = 1'b0;  // normal WB data
                 end
 
@@ -88,6 +92,7 @@ module Write_Back_Stage_CU(
                         end
                     endcase
                 end
+
 
                 // loop (opcode 10)
                 4'd10: begin

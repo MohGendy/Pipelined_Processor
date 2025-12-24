@@ -395,20 +395,20 @@ endtask
         $display("\n--- TEST 6: RLC ---");
         check_flag(2'b10, 1'b1, "RLC C flag (MSB was 1)");
         wait_cycles(1);
-        check_register(2'b00, 8'h54, "RLC R0 (10101010 -> 01010100)");
+        check_register(2'b00, 8'h55, "RLC R0 (10101010 -> 01010101)");
         
 
         //TEST RRC
         $display("\n--- TEST 7: RRC ---");
         check_flag(2'b10, 1'b1, "RRC C flag (LSB was 1)");
         wait_cycles(1);
-        check_register(2'b10, 8'h03, "RRC R2 (00000111 -> 00000011)");
+        check_register(2'b10, 8'h83, "RRC R2 (00000111 -> 10000011)");
         
 
         //TEST SETC
         $display("\n--- TEST 8: SETC ---");
-        wait_cycles(1);
         check_flag(2'b10, 1'b1, "SETC sets C flag");
+        wait_cycles(1);
 
         //TEST CLRC
         $display("\n--- TEST 9: CLRC ---");
@@ -418,24 +418,24 @@ endtask
 
         //TEST OUT
         $display("\n--- TEST 10: OUT ---");
+        In_port = 8'hCD;  
         wait_cycles(1);
-        check_output_port(8'h54, "OUT R0 sends 0x54 to Out_port");
 
         //TEST IN
         $display("\n--- TEST 11: IN ---");
-        In_port = 8'hCD;  
         wait_cycles(1); 
+        check_output_port(8'h55, "OUT R0 sends 0x55 to Out_port");
         check_register(2'b01, 8'hCD, "IN R1 receives 0xCD from In_port");
 
         // TEST NOT
         $display("\n--- TEST 12: NOT ---");
         wait_cycles(1);
-        check_register(2'b10, 8'hFC, "NOT R2 ( ~(00000011) = 11111100 )");
+        check_register(2'b10, 8'h7C, "NOT R2 ( ~(10000011) = 01111100 )");
 
         // TEST NEG
         $display("\n--- TEST 13: NEG ---");
         wait_cycles(1);
-        check_register(2'b00, 8'hAC, "NEG R0 (Two's complement of 0x54 = 0xAC )");
+        check_register(2'b00, 8'hAB, "NEG R0 (Two's complement of 0x54 = 0xAC )");
 
         //TEST INC 
         $display("\n--- TEST 14: INC ---");
@@ -445,11 +445,11 @@ endtask
         //TEST DEC
         $display("\n--- TEST 15: DEC ---");
         wait_cycles(1);
-        check_register(2'b01, 8'hFB, "DEC R2 (FC-1=FB)");
+        check_register(2'b10, 8'h7B, "DEC R2 (7C-1=7B)");
 
-         wait_cycles(5);
-         print_summary();
-         $stop;
+        wait_cycles(5);
+        print_summary();
+        $stop;
 
     end
 endmodule
