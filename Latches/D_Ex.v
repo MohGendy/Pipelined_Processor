@@ -13,13 +13,11 @@ module D_Ex_Latch (
     input in_out_ld,
     // 4
     input in_MW,
-    input in_SM1,
     input in_SM2,
     // 5
     input [3:0]in_ALU,
     input [4:0]in_Flags,
     input [2:0]in_BU,
-    input in_SE1,
     input in_SE2,
     input [1:0]in_SE3,
     //6
@@ -44,13 +42,11 @@ module D_Ex_Latch (
     output reg out_ld,
     // 4
     output reg MW,
-    output reg SM1,
     output reg SM2,
     // 5
     output reg [3:0]ALU,
     output reg [4:0]Flags,
     output reg [2:0]BU,
-    output reg SE1,
     output reg SE2,
     output reg [1:0]SE3,
     // 6
@@ -75,13 +71,11 @@ module D_Ex_Latch (
             out_ld <= 1'b0;
             // 4
             MW <= 1'b0;
-            SM1 <= 1'b0;
             SM2 <= 1'b0;
             // 5
             ALU <= 4'b0;
             Flags <= 5'b0;
             BU <= 3'b0;
-            SE1 <= 1'b0;
             SE2 <= 1'b0;
             SE3 <= 2'b0;
             // 6
@@ -104,13 +98,11 @@ module D_Ex_Latch (
                 out_ld <= in_out_ld;
                 // 4
                 MW <= in_MW;
-                SM1 <= in_SM1;
                 SM2 <= in_SM2;
                 // 5
                 ALU <= in_ALU;
                 Flags <= in_Flags;
                 BU <= in_BU;
-                SE1 <= in_SE1;
                 SE2 <= in_SE2;
                 SE3 <= in_SE3;
                 // 6

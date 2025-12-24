@@ -50,10 +50,11 @@ module Control_Unit (
     output reg         pc_load,
     output reg         stall,
     output reg         sf1, // 0 always (inst data) , 1 Int (pc) //output to IR reg
-    output reg [1:0]   counter,
     output reg [1:0]   pc_src,
     output reg [1:0]   addr_src,
-    output reg         int_clr  
+    output reg         int_clr,
+
+    output reg         Int_en  
 );
 
 //wires 
@@ -140,10 +141,15 @@ assign ra = IR[3:2] ; //or brx
         .pc_load(pc_load),
         .stall(stall),
         .sf1(sf1), 
-        .counter(counter),
         .pc_src(pc_src),
         .addr_src(addr_src),
         .int_clr(int_clr) 
     );
+
+    always @(posedge clk or negedge rst) begin
+        if(!rst) Int_en = 1'b0;
+        else if (sf1) Int_en = 1'b1;
+        else if (op_code == 4'd11 && ra == 2'd3 ) Int_en = 1'b0;
+    end
 
 endmodule

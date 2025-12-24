@@ -11,7 +11,6 @@ module Fetch_Stage_CU (
     output reg         pc_load,
     output reg         stall,
     output reg         sf1, // 0 always (inst data) , 1 Int (pc)
-    output reg [1:0]   counter,
     output reg [1:0]   pc_src,
     output reg [1:0]   addr_src,
     output reg         int_clr    
@@ -23,6 +22,7 @@ localparam  S_RESET_INTER = 3'd0,
             S_WAIT   = 3'd3,
             S_BRANCH = 3'd4;
 
+reg [1:0]   counter;
 reg [2:0] state, next_state;
 reg two_byte;
 reg pc_was_loaded;  // Track if PC was loaded in previous state
@@ -55,6 +55,8 @@ always @(posedge clk or negedge reset) begin
     else
     if (state == S_WAIT &! stall_in)
         counter <= counter + 1;
+    else if (state == S_WAIT && stall_in)
+        counter <= counter;
     else 
         counter <= 2'b00;
 end
