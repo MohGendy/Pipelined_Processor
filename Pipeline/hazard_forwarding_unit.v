@@ -18,14 +18,14 @@
 
 module hazard_forwarding_unit (
     // Inputs from Current Stage (ID/EX) - The instruction needing data
-    input [2:0] ra_ex,          // Address of Source Register A
-    input [2:0] rb_ex,          // Address of Source Register B
+    input [1:0] ra_ex,          // Address of Source Register A
+    input [1:0] rb_ex,          // Address of Source Register B
 
     // Inputs from Memory Stage (EX/MEM) - The previous instruction
     input       we_mem,         // Write Enable: Is the instruction writing to RegFile?
     input       sw1_mem,        // Select Write Address: 0 for Ra, 1 for Rb (Destination)
-    input [2:0] ra_mem,         // Ra address passed to MEM stage
-    input [2:0] rb_mem,         // Rb address passed to MEM stage
+    input [1:0] ra_mem,         // Ra address passed to MEM stage
+    input [1:0] rb_mem,         // Rb address passed to MEM stage
     input       sm2_mem,         // Memory Mux Select: 0 = Pass ALU Result, 1 = Load from Memory
     input       sw2_mem,        //  Write Data Mux: 0 = Memory/ALU Data, 1 = Input Port Wire but for memory stage
 
@@ -33,8 +33,8 @@ module hazard_forwarding_unit (
     // Inputs from Write-Back Stage (MEM/WB) - The instruction before previous
     input       we_wb,          // Write Enable
     input       sw1_wb,         // Select Write Address: 0 for Ra, 1 for Rb
-    input [2:0] ra_wb,          // Ra address passed to WB stage
-    input [2:0] rb_wb,          // Rb address passed to WB stage
+    input [1:0] ra_wb,          // Ra address passed to WB stage
+    input [1:0] rb_wb,          // Rb address passed to WB stage
     input       sw2_wb,         // Write Data Mux: 0 = Memory/ALU Data, 1 = Input Port Wire
 
     // Outputs
@@ -44,8 +44,8 @@ module hazard_forwarding_unit (
 );
 
     // Internal variables to hold the calculated Destination Address for MEM and WB stages
-    reg [2:0] dest_mem;
-    reg [2:0] dest_wb;
+    reg [1:0] dest_mem;
+    reg [1:0] dest_wb;
 
     always @(*) begin
 

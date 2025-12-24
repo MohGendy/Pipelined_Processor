@@ -2,7 +2,7 @@
     input wire clk,
     input wire rst, 
     input wire [3:0] Flags_in,         // Flags from ALU {V, C, N, Z}
-    input wire intr_en,              // Interrupt enable mode
+    input wire intr_en,               // Interrupt enable mode
     input wire  Z_Flag_en,           // Enable signals {V_en, C_en, N_en, Z_en}
     input wire  N_Flag_en,  
     input wire  C_Flag_en,  

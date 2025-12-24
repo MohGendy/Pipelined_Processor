@@ -30,7 +30,9 @@ module top (
     wire flush_IR  ; //!
     wire reg_sf1   ;
     wire [7:0] IR  ;
+    wire ld_IR     ;
 
+    wire bypass_decode_done ;
 
 //? Decode
 
@@ -91,7 +93,7 @@ module top (
     wire [2:0] BU_Ex      ;
     wire SE2_Ex     ;
     wire [1:0] SE3_Ex     ;
-    wire Hlt_Ex     ;
+    wire Hlt_en_Ex        ;
     
 //? Excute 
 
@@ -134,7 +136,7 @@ module top (
     wire MW_M       ;
     wire SM2_M      ;
     wire [7:0] res_M      ;
-    wire Hlt_M      ;
+    wire Hlt_en_M         ;
 
 //? Memory
 
@@ -153,7 +155,7 @@ module top (
     wire SW2_Wb     ;
     wire out_ld_Wb  ;
     wire [7:0] DataOut_Wb ;
-    wire Hlt_Wb     ;
+    wire Hlt_en_Wb        ;
 
 //? Write back
 
@@ -163,381 +165,400 @@ module top (
     wire [7:0] data_to_cpu ;
 
     wire intr_in ;
+
+
 //! assigns
 
-assign RB_addr = IR[1:0];
-assign flags_in = {Overflow,Carry_Flag_OUT,Negative_Flag,Zero_Flag};
-assign in_SP = {sp_inc,sp_dec};
-assign flags_en = {Int_en,Z_Flag_en,N_Flag_en,C_Flag_en,V_Flag_en};
-assign flush_IR = flush || stall_CU; //! yet to add decode branching Gemyy
-assign ba = flush;
-//! modules
+    assign RB_addr  = IR[1:0];
+    assign flags_in = {Overflow,Carry_Flag_OUT,Negative_Flag,Zero_Flag};
+    assign in_SP    = {sp_inc,sp_dec};
+    assign flags_en = {Int_en,Z_Flag_en,N_Flag_en,C_Flag_en,V_Flag_en};
+    assign flush_IR = flush || stall_CU; //! yet to add decode branching Gemyy
+    assign ba       = flush;
+
+    //latches flush/ load
+        assign ld_M_Wb    = 1'b1 ;
+        assign flush_M_Wb = 1'b0 ;
+
+        assign ld_Ex_M    = 1'b1 ;
+        assign flush_Ex_M = stall ; //stall from hazard unit
+
+        assign ld_D_Ex    = !stall ; //stall from hazard unit 
+        assign flush_D_Ex = (!stall) & (flush || 1'b1) ; //! or with the flush signal from decode bypass unit not 1'b1
+
+        assign ld_IR      = (!stall) & (! 1'b0) ;  //! not 1'b0 it is stall from bypass decode unit
+        assign flush_IR   = (!stall ) & flush   ; 
+
+        assign bypass_decode_done = 1'b1 ;  //!should be from decode bypass unit
+
+//! modules instantiation
 //? fetch
-pc_in_mux u_pc_in_mux( //*
-    .pc_src    (pc_src    ),
-    .data_out  (D_data    ), 
-    .reg_rb_d  (reg_rb_d  ), //! Gemyy
-    .I_out     (I_data    ), 
-    .reg_rb_ex (RD_B_Ex   ),
-    .pc_in     (pc_in     )
-);
+    pc_in_mux u_pc_in_mux( //:)
+        .pc_src    (pc_src    ),
+        .data_out  (D_data    ), 
+        .reg_rb_d  (reg_rb_d  ), //! Gemyy
+        .I_out     (I_data    ), 
+        .reg_rb_ex (RD_B_Ex   ),
+        .pc_in     (pc_in     )
+    );
 
-PC u_PC( //*
-    .clk     (clk     ),
-    .pc_load (pc_load ),
-    .pc_en   (pc_en   ),
-    .pc_in   (pc_in   ),
-    .pc_out  (PC      )
-);
+    PC u_PC( //:)
+        .clk     (clk     ),
+        .pc_load (pc_load ),
+        .pc_en   (pc_en   ),
+        .pc_in   (pc_in   ),
+        .pc_out  (PC      )
+    );
 
-mem_addr_mux u_mem_addr_mux( //*
-    .addr_src (addr_src ),
-    .pc       (PC       ),
-    .mem_addr (I_addr   )
-);
+    mem_addr_mux u_mem_addr_mux( //:)
+        .addr_src (addr_src ),
+        .pc       (PC       ),
+        .mem_addr (I_addr   )
+    );
 
-Memory u_Memory( //*
-    .clk    (clk    ),
-    .rst    (rst    ),
-    .I_addr (I_addr ),
-    .D_addr (res_M  ),
-    .Wdata  (R_rb_M ), 
-    .WEn    (MW_M   ),
-    .I_data (I_data ), 
-    .D_data (D_data )
-);
+    Memory u_Memory( //:)
+        .clk    (clk    ),
+        .rst    (rst    ),
+        .I_addr (I_addr ),
+        .D_addr (res_M  ),
+        .Wdata  (R_rb_M ), 
+        .WEn    (MW_M   ),
+        .I_data (I_data ), 
+        .D_data (D_data )
+    );
 
-mux_2to1 MF1( //*
-    .sel (sf1    ),
-    .in0 (I_data ),
-    .in1 (PC     ),
-    .out (MF1_out)
-);
+    mux_2to1 MF1( //:)
+        .sel (sf1    ),
+        .in0 (I_data ),
+        .in1 (PC     ),
+        .out (MF1_out)
+    );
 
-instruction_reg IR_u( //*
-    .clk     (clk     ),
-    .rst     (rst     ),
-    .flush   (flush_IR),
-    .sf1_in  (sf1     ),
-    .ir_new  (MF1_out ),
-    .reg_sf1 (reg_sf1 ),
-    .ir      (IR      )
-);
+    instruction_reg IR_u( //:)
+        .clk     (clk     ),
+        .rst     (rst     ),
+        .flush   (flush_IR),
+        .ld      (ld_IR   ),
+        .sf1_in  (sf1     ),
+        .ir_new  (MF1_out ),
+        .reg_sf1 (reg_sf1 ),
+        .ir      (IR      )
+    );
 
 //? Decode 
 
-regfile regFile ( //*
-    .clk     (clk      ),
-    .WE      (RW_Wb    ), 
-    .IncSP   (SP_Wb[1] ),
-    .DecSP   (SP_Wb[0] ),
-    .RA_addr (RA_addr  ),
-    .RB_addr (RB_addr  ),
-    .RW_addr (RW_addr  ),
-    .WD      (WD       ),
-    .RD_A    (RD_A     ),
-    .RD_B    (RD_B     )
-);
+    regfile regFile ( //:)
+        .clk     (clk      ),
+        .WE      (RW_Wb    ), 
+        .IncSP   (SP_Wb[1] ),
+        .DecSP   (SP_Wb[0] ),
+        .RA_addr (RA_addr  ),
+        .RB_addr (RB_addr  ),
+        .RW_addr (RW_addr  ),
+        .WD      (WD       ),
+        .RD_A    (RD_A     ),
+        .RD_B    (RD_B     )
+    );
 
-mux_2to1 MD1( //*
-    .sel (SD1     ),
-    .in0 (IR[3:2] ),
-    .in1 (8'd3    ),
-    .out (RA_addr )
-);
+    mux_2to1 MD1( //:)
+        .sel (SD1     ),
+        .in0 (IR[3:2] ),
+        .in1 (8'd3    ),
+        .out (RA_addr )
+    );
 
-mux_2to1 MD2( //*
-    .sel (SD2       ),
-    .in0 (I_data    ), //* imm/ea
-    .in1 (RD_A      ),
-    .out (in_RD_A_D )
-);
+    mux_2to1 MD2( //:)
+        .sel (SD2       ),
+        .in0 (I_data    ), //* imm/ea
+        .in1 (RD_A      ),
+        .out (in_RD_A_D )
+    );
 
-mux_4to1 MD3( //*
-    .sel (SD3       ),
-    .in0 (RD_B      ),
-    .in1 (PC        ), //* PC+1 (in call)
-    .in2 (IR        ), //* PC+1 (interrupt)
-    .in3 (8'b0      ), //* dont care
-    .out (in_RD_B_D )
-);
+    mux_4to1 MD3( //:)
+        .sel (SD3       ),
+        .in0 (RD_B      ),
+        .in1 (PC        ), //* PC+1 (in call)
+        .in2 (IR        ), //* PC+1 (interrupt)
+        .in3 (8'b0      ), //* dont care
+        .out (in_RD_B_D )
+    );
 
 //! CU
 
-Control_Unit u_Control_Unit( //! 1
-    .clk                (clk                ),
-    .rst                (rst                ),
-    .IR                 (IR                 ),
-    .reg_sf1            (reg_sf1            ),
-    .intr               (intr_in            ),
-    .stall_in           (stall              ),
-    .branch_taken       (flush              ),
-    .bypass_decode_done (bypass_decode_done ), //! Gemyy
-    
-    .bu_op              (bu_op              ),
-    .SE2                (SE2                ),
-    .SE3                (SE3                ),
-    .ALU_CONTROL        (ALU_CONTROL        ),
-    .Z_Flag_en          (Z_Flag_en          ),
-    .N_Flag_en          (N_Flag_en          ),
-    .C_Flag_en          (C_Flag_en          ),
-    .V_Flag_en          (V_Flag_en          ),
-    .SD1                (SD1                ), 
-    .SD2                (SD2                ), 
-    .SD3                (SD3                ), 
-    .Wm                 (Wm                 ), 
-    .SM2                (SM2                ),
-    .write_en           (write_en           ),
-    .sw1                (sw1                ),
-    .sw2                (sw2                ),
-    .sp_inc             (sp_inc             ),
-    .sp_dec             (sp_dec             ),
-    .ld_out             (ld_out             ),
-    .HLT_en             (HLT_en             ),
-    .pc_en              (pc_en              ), 
-    .pc_load            (pc_load            ),
-    .stall              (stall_CU           ),
-    .sf1                (sf1                ), 
-    .pc_src             (pc_src             ),
-    .addr_src           (addr_src           ), 
-    .int_clr            (int_clr            ),
-    .Int_en             (Int_en             )
-);
+    Control_Unit u_Control_Unit( //! 1
+        .clk                (clk                ),
+        .rst                (rst                ),
+        .IR                 (IR                 ),
+        .reg_sf1            (reg_sf1            ),
+        .intr               (intr_in            ),
+        .stall_in           (stall              ),
+        .branch_taken       (flush              ),
+        .bypass_decode_done (bypass_decode_done ), //! Gemyy
+        
+        .bu_op              (bu_op              ),
+        .SE2                (SE2                ),
+        .SE3                (SE3                ),
+        .ALU_CONTROL        (ALU_CONTROL        ),
+        .Z_Flag_en          (Z_Flag_en          ),
+        .N_Flag_en          (N_Flag_en          ),
+        .C_Flag_en          (C_Flag_en          ),
+        .V_Flag_en          (V_Flag_en          ),
+        .SD1                (SD1                ), 
+        .SD2                (SD2                ), 
+        .SD3                (SD3                ), 
+        .Wm                 (Wm                 ), 
+        .SM2                (SM2                ),
+        .write_en           (write_en           ),
+        .sw1                (sw1                ),
+        .sw2                (sw2                ),
+        .sp_inc             (sp_inc             ),
+        .sp_dec             (sp_dec             ),
+        .ld_out             (ld_out             ),
+        .HLT_en             (HLT_en             ),
+        .pc_en              (pc_en              ), 
+        .pc_load            (pc_load            ),
+        .stall              (stall_CU           ),
+        .sf1                (sf1                ), 
+        .pc_src             (pc_src             ),
+        .addr_src           (addr_src           ), 
+        .int_clr            (int_clr            ),
+        .Int_en             (Int_en             )
+    );
 
-D_Ex_Latch u_D_Ex_Latch(
-    .in_ra     (RA_addr   ),
-    .in_rb     (RB_addr   ),
-    .in_R_ra   (in_RD_A_D ),
-    .in_R_rb   (in_RD_B_D ),
+    D_Ex_Latch u_D_Ex_Latch(
+        .in_ra     (RA_addr   ),
+        .in_rb     (RB_addr   ),
+        .in_R_ra   (in_RD_A_D ),
+        .in_R_rb   (in_RD_B_D ),
 
-    .in_RW     (write_en  ),
-    .in_SP     (in_SP     ),
-    .in_SW1    (sw1       ),
-    .in_SW2    (sw2       ),
-    .in_out_ld (ld_out    ),
-    .in_MW     (Wm        ),
-    .in_SM2    (SM2       ),
-    .in_ALU    (ALU_CONTROL    ),
-    .in_Flags  (flags_en  ),
-    .in_BU     (bu_op     ),
-    .in_SE2    (SE2       ),
-    .in_SE3    (SE3       ),
-    .in_Hlt    (HLT_en    ),
+        .in_RW     (write_en  ),
+        .in_SP     (in_SP     ),
+        .in_SW1    (sw1       ),
+        .in_SW2    (sw2       ),
+        .in_out_ld (ld_out    ),
+        .in_MW     (Wm        ),
+        .in_SM2    (SM2       ),
+        .in_ALU    (ALU_CONTROL),
+        .in_Flags  (flags_en  ),
+        .in_BU     (bu_op     ),
+        .in_SE2    (SE2       ),
+        .in_SE3    (SE3       ),
+        .in_Hlt    (HLT_en    ),
 
-    .clk       (clk       ),
-    .reset     (rst       ),
-    .ld        (ld_D_Ex   ),
-    .flush     (flush_D_Ex),
+        .clk       (clk       ),
+        .reset     (rst       ),
+        .ld        (ld_D_Ex   ),
+        .flush     (flush_D_Ex),
 
-    .ra        (ra_Ex        ),
-    .rb        (rb_Ex        ),
-    .R_ra      (R_ra_Ex      ),
-    .R_rb      (R_rb_Ex      ),
-    .RW        (RW_Ex        ),
-    .SP        (SP_Ex        ),
-    .SW1       (SW1_Ex       ),
-    .SW2       (SW2_Ex       ),
-    .out_ld    (out_ld_Ex    ),
-    .MW        (MW_Ex        ),
-    .SM2       (SM2_Ex       ),
-    .ALU       (ALU_Ex       ),
-    .Flags     (Flags_Ex     ),
-    .BU        (BU_Ex        ),
-    .SE2       (SE2_Ex       ),
-    .SE3       (SE3_Ex       ),
-    .Hlt       (Hlt_Ex       )
-);
+        .ra        (ra_Ex        ),
+        .rb        (rb_Ex        ),
+        .R_ra      (R_ra_Ex      ),
+        .R_rb      (R_rb_Ex      ),
+        .RW        (RW_Ex        ),
+        .SP        (SP_Ex        ),
+        .SW1       (SW1_Ex       ),
+        .SW2       (SW2_Ex       ),
+        .out_ld    (out_ld_Ex    ),
+        .MW        (MW_Ex        ),
+        .SM2       (SM2_Ex       ),
+        .ALU       (ALU_Ex       ),
+        .Flags     (Flags_Ex     ),
+        .BU        (BU_Ex        ),
+        .SE2       (SE2_Ex       ),
+        .SE3       (SE3_Ex       ),
+        .Hlt       (Hlt_en_Ex    )
+    );
 
-//! bypass decode Gemyy
+//! bypass \Gemyy
 
 
 //? Excute
 
-mux_4to1 MHA(
-    .sel (SHA         ),
-    .in0 (R_ra_Ex     ),
-    .in1 (res_M       ),
-    .in2 (DataOut_Wb  ),
-    .in3 (data_to_cpu ), 
-    .out (RD_A_Ex     )
-);
+    mux_4to1 MHA(//:)
+        .sel (SHA         ),
+        .in0 (R_ra_Ex     ),
+        .in1 (res_M       ),
+        .in2 (DataOut_Wb  ),
+        .in3 (data_to_cpu ), 
+        .out (RD_A_Ex     )
+    );
 
-mux_4to1 MHB(
-    .sel (SHB         ),
-    .in0 (R_rb_Ex     ),
-    .in1 (res_M       ),
-    .in2 (DataOut_Wb  ),
-    .in3 (data_to_cpu ), 
-    .out (RD_B_Ex     )
-);
+    mux_4to1 MHB(//:)
+        .sel (SHB         ),
+        .in0 (R_rb_Ex     ),
+        .in1 (res_M       ),
+        .in2 (DataOut_Wb  ),
+        .in3 (data_to_cpu ), 
+        .out (RD_B_Ex     )
+    );
 
 
-mux_2to1 ME2(
-    .sel (SE2_Ex  ),
-    .in0 (RD_B_Ex ), 
-    .in1 (8'b1    ),
-    .out (ME2_out )
-);
+    mux_2to1 ME2(//:)
+        .sel (SE2_Ex  ),
+        .in0 (RD_B_Ex ), 
+        .in1 (8'b1    ),
+        .out (ME2_out )
+    );
 
-ALU u_ALU(
-    .A              (RD_A_Ex        ),
-    .B              (ME2_out        ),
-    .ALU_CONTROL    (ALU_Ex         ),
-    .Carry_Flag_IN  (CCR_out[2]     ),
-    .ALU_OUT        (ALU_OUT        ),
-    .Zero_Flag      (Zero_Flag      ),
-    .Negative_Flag  (Negative_Flag  ),
-    .Carry_Flag_OUT (Carry_Flag_OUT ),
-    .Overflow       (Overflow       )
-);
+    ALU u_ALU(//:)
+        .A              (RD_A_Ex        ),
+        .B              (ME2_out        ),
+        .ALU_CONTROL    (ALU_Ex         ),
+        .Carry_Flag_IN  (CCR_out[2]     ),
+        .ALU_OUT        (ALU_OUT        ),
+        .Zero_Flag      (Zero_Flag      ),
+        .Negative_Flag  (Negative_Flag  ),
+        .Carry_Flag_OUT (Carry_Flag_OUT ),
+        .Overflow       (Overflow       )
+    );
 
-mux_4to1 ME3(
-    .sel (SE3_Ex ),
-    .in0 (ALU_OUT),
-    .in1 (RD_A_Ex),
-    .in2 (RD_B_Ex),
-    .in3 (8'b0   ),
-    .out (Res_EX )
-);
+    mux_4to1 ME3(//:)
+        .sel (SE3_Ex ),
+        .in0 (ALU_OUT),
+        .in1 (RD_A_Ex),
+        .in2 (RD_B_Ex),
+        .in3 (8'b0   ),
+        .out (Res_EX )
+    );
 
-CCR CCReg(
-    .clk       (clk         ),
-    .rst       (rst         ), 
-    .Flags_in  (flags_in    ), 
-    .intr_en   (Flags_Ex[4] ),            
-    .Z_Flag_en (Flags_Ex[3] ),    
-    .N_Flag_en (Flags_Ex[2] ),  
-    .C_Flag_en (Flags_Ex[1] ),  
-    .V_Flag_en (Flags_Ex[0] ),  
-    .Flags_out (CCR_out     )    
-);
+    CCR CCReg(//:)
+        .clk       (clk         ),
+        .rst       (rst         ), 
+        .Flags_in  (flags_in    ), 
+        .intr_en   (Flags_Ex[4] ),            
+        .Z_Flag_en (Flags_Ex[3] ),    
+        .N_Flag_en (Flags_Ex[2] ),  
+        .C_Flag_en (Flags_Ex[1] ),  
+        .V_Flag_en (Flags_Ex[0] ),  
+        .Flags_out (CCR_out     )    
+    );
 
-branch_unit BU(
-    .bu_op (BU_Ex     ),
-    .flags (CCR_out   ),
-    .z_now (Zero_Flag ),
-    .flush (flush     )
-);
+    branch_unit BU(//:)
+        .bu_op (BU_Ex     ),
+        .flags (CCR_out   ),
+        .z_now (Zero_Flag ),
+        .flush (flush     )
+    );
 
-Ex_M_Latch u_Ex_M_Latch(
-    .in_ra     (ra_Ex     ),
-    .in_rb     (rb_Ex     ),
-    .in_R_rb   (R_rb_Ex   ),
-    .in_RW     (RW_Ex     ),
-    .in_SP     (SP_Ex     ),
-    .in_SW1    (SW1_Ex    ),
-    .in_SW2    (SW2_Ex    ),
-    .in_out_ld (out_ld_Ex ),
-    .in_MW     (MW_Ex     ),
-    .in_SM2    (SM2_Ex    ),
-    .in_res    (Res_EX    ),
-    .in_Hlt    (Hlt_Ex    ),
+    Ex_M_Latch u_Ex_M_Latch(
+        .in_ra     (ra_Ex     ),
+        .in_rb     (rb_Ex     ),
+        .in_R_rb   (R_rb_Ex   ),
+        .in_RW     (RW_Ex     ),
+        .in_SP     (SP_Ex     ),
+        .in_SW1    (SW1_Ex    ),
+        .in_SW2    (SW2_Ex    ),
+        .in_out_ld (out_ld_Ex ),
+        .in_MW     (MW_Ex     ),
+        .in_SM2    (SM2_Ex    ),
+        .in_res    (Res_EX    ),
+        .in_Hlt    (Hlt_en_Ex ),
 
-    .clk       (clk       ),
-    .reset     (rst       ),
-    .ld        (ld_Ex_M   ),
-    .flush     (flush_Ex_M),
+        .clk       (clk       ),
+        .reset     (rst       ),
+        .ld        (ld_Ex_M   ),
+        .flush     (flush_Ex_M),
 
-    .ra        (ra_M      ),
-    .rb        (rb_M      ),
-    .R_rb      (R_rb_M    ),
-    .RW        (RW_M      ),
-    .SP        (SP_M      ),
-    .SW1       (SW1_M     ),
-    .SW2       (SW2_M     ),
-    .out_ld    (out_ld_M  ),
-    .MW        (MW_M      ),
-    .SM2       (SM2_M     ),
-    .res       (res_M     ),
-    .Hlt       (Hlt_M     )
-);
+        .ra        (ra_M      ),
+        .rb        (rb_M      ),
+        .R_rb      (R_rb_M    ),
+        .RW        (RW_M      ),
+        .SP        (SP_M      ),
+        .SW1       (SW1_M     ),
+        .SW2       (SW2_M     ),
+        .out_ld    (out_ld_M  ),
+        .MW        (MW_M      ),
+        .SM2       (SM2_M     ),
+        .res       (res_M     ),
+        .Hlt       (Hlt_en_M  )
+    );
 
-hazard_forwarding_unit u_hazard_forwarding_unit(
-    .ra_ex     (ra_Ex     ),
-    .rb_ex     (rb_Ex     ),
-    .we_mem    (RW_M      ),
-    .sw1_mem   (SW1_M     ),
-    .ra_mem    (ra_M      ),
-    .rb_mem    (rb_M      ),
-    .sm2_mem   (SM2_M     ),
-    .sw2_mem   (SW2_M     ),
-    .we_wb     (RW_Wb     ),
-    .sw1_wb    (SW1_Wb    ),
-    .ra_wb     (ra_Wb     ),
-    .rb_wb     (rb_Wb     ),
-    .sw2_wb    (SW2_Wb    ),
-    .stall     (stall     ),
-    .forward_a (SHA       ),
-    .forward_b (SHB       )
-);
+    hazard_forwarding_unit u_hazard_forwarding_unit( //:)
+        .ra_ex     (ra_Ex     ),
+        .rb_ex     (rb_Ex     ),
+        .we_mem    (RW_M      ),
+        .sw1_mem   (SW1_M     ),
+        .ra_mem    (ra_M      ),
+        .rb_mem    (rb_M      ),
+        .sm2_mem   (SM2_M     ),
+        .sw2_mem   (SW2_M     ),
+        .we_wb     (RW_Wb     ),
+        .sw1_wb    (SW1_Wb    ),
+        .ra_wb     (ra_Wb     ),
+        .rb_wb     (rb_Wb     ),
+        .sw2_wb    (SW2_Wb    ),
+        .stall     (stall     ),
+        .forward_a (SHA       ),
+        .forward_b (SHB       )
+    );
 
 //? Memory
 
-mux_2to1 MM2(
-    .sel (SM2_M   ),
-    .in0 (res_M   ),
-    .in1 (D_data  ),
-    .out (DataOut )
-);
+    mux_2to1 MM2( //:)
+        .sel (SM2_M   ),
+        .in0 (res_M   ),
+        .in1 (D_data  ),
+        .out (DataOut )
+    );
 
-M_WB_Latch u_M_WB_Latch(
-    .in_ra      (ra_M       ),
-    .in_rb      (rb_M       ),
-    .in_RW      (RW_M       ),
-    .in_SP      (SP_M       ),
-    .in_SW1     (SW1_M      ),
-    .in_SW2     (SW2_M      ),
-    .in_out_ld  (out_ld_M   ),
-    .in_DataOut (DataOut    ),
-    .in_Hlt     (Hlt_M      ),
+    M_WB_Latch u_M_WB_Latch(
+        .in_ra      (ra_M       ),
+        .in_rb      (rb_M       ),
+        .in_RW      (RW_M       ),
+        .in_SP      (SP_M       ),
+        .in_SW1     (SW1_M      ),
+        .in_SW2     (SW2_M      ),
+        .in_out_ld  (out_ld_M   ),
+        .in_DataOut (DataOut    ),
+        .in_Hlt     (Hlt_en_M   ),
 
-    .clk        (clk        ),
-    .reset      (rst        ),
-    .ld         (ld_M_Wb    ),
-    .flush      (flush_M_Wb ),
+        .clk        (clk        ),
+        .reset      (rst        ),
+        .ld         (ld_M_Wb    ),
+        .flush      (flush_M_Wb ),
 
-    .ra         (ra_Wb         ),
-    .rb         (rb_Wb         ),
-    .RW         (RW_Wb         ),
-    .SP         (SP_Wb         ),
-    .SW1        (SW1_Wb        ),
-    .SW2        (SW2_Wb        ),
-    .out_ld     (out_ld_Wb     ),
-    .DataOut    (DataOut_Wb    ),
-    .Hlt        (Hlt_Wb        )
-);
+        .ra         (ra_Wb         ),
+        .rb         (rb_Wb         ),
+        .RW         (RW_Wb         ),
+        .SP         (SP_Wb         ),
+        .SW1        (SW1_Wb        ),
+        .SW2        (SW2_Wb        ),
+        .out_ld     (out_ld_Wb     ),
+        .DataOut    (DataOut_Wb    ),
+        .Hlt        (Hlt_en_Wb     )
+    );
 
 //? Write back
 
-mux_2to1 MW1(
-    .sel (SW1_Wb  ),
-    .in0 (ra_Wb   ),
-    .in1 (rb_Wb   ),
-    .out (RW_addr )
-);
-
-mux_2to1 MW2(
-    .sel (SW2_Wb      ),
-    .in0 (DataOut_Wb  ),
-    .in1 (data_to_cpu ),
-    .out (WD          )
-);
-
-ports_interrupt ports (
-        .clk            (clk            ),
-        .rst            (rst            ),
-        .in_port        (In_port        ),
-        .intr           (int            ),
-        .out_en         (out_ld_Wb      ),
-        .HLT_en         (Hlt_Wb         ),
-        .data_from_cpu  (DataOut_Wb     ),
-        .intr_clear     (int_clr        ),
-
-        .out_port       (Out_port       ),
-        .HLT_flag       (HLT            ),
-        .data_to_cpu    (data_to_cpu    ),
-        .intr_flag      (intr_in        )
+    mux_2to1 MW1( //:)
+        .sel (SW1_Wb  ),
+        .in0 (ra_Wb   ),
+        .in1 (rb_Wb   ),
+        .out (RW_addr )
     );
+
+    mux_2to1 MW2( //:)
+        .sel (SW2_Wb      ),
+        .in0 (DataOut_Wb  ),
+        .in1 (data_to_cpu ),
+        .out (WD          )
+    );
+
+    ports_interrupt ports ( //:)
+            .clk            (clk            ),
+            .rst            (rst            ),
+            .in_port        (In_port        ),
+            .intr           (int            ),
+            .out_en         (out_ld_Wb      ),
+            .HLT_en         (Hlt_en_Wb      ),
+            .data_from_cpu  (DataOut_Wb     ),
+            .intr_clear     (int_clr        ),
+
+            .out_port       (Out_port       ),
+            .HLT_flag       (HLT            ),
+            .data_to_cpu    (data_to_cpu    ),
+            .intr_flag      (intr_in        )
+        );
 
 
 

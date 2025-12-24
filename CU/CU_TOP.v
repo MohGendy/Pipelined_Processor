@@ -1,12 +1,12 @@
 module Control_Unit (
     input clk ,
-    input rst ,                      //active low reset
-    input [7:0] IR ,                //the 8bit instruction
-    input reg_sf1 ,                //registered interrupt flag
-    input intr,                   //registerd interrup signal
-    input stall_in,              //signal from hazard unit
-    input  branch_taken,        //signal from branch unit
-    input  bypass_decode_done, //signal from hazard unit
+    input rst ,                     //active low reset
+    input [7:0] IR ,               //the 8bit instruction
+    input reg_sf1 ,               //registered interrupt flag
+    input intr,                  //registerd interrup signal
+    input stall_in,             //signal from hazard unit
+    input branch_taken,        //signal from branch unit
+    input bypass_decode_done, //signal from hazard unit
 
 //Branch unit CU signls
     output reg  [2:0] bu_op ,  // Output to Branch Unit
@@ -148,8 +148,8 @@ assign ra = IR[3:2] ; //or brx
 
     always @(posedge clk or negedge rst) begin
         if(!rst) Int_en = 1'b0;
-        else if (sf1) Int_en = 1'b1;
-        else if (op_code == 4'd11 && ra == 2'd3 ) Int_en = 1'b0;
+        else if (sf1) Int_en = 1'b1; //interrupt
+        else if (op_code == 4'd11 && ra == 2'd3 ) Int_en = 1'b0; //RTI
     end
 
 endmodule
