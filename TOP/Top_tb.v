@@ -335,6 +335,18 @@ endtask
         load_instruction_memory(8'd18,8'h84); //NEG R0  0100
         load_instruction_memory(8'd19,8'h89); //INC R1  1001
         load_instruction_memory(8'd20,8'h8E); //DEC R2  1110
+        load_instruction_memory(8'd21,8'hC1); //LDM R1, #0x0F
+        load_instruction_memory(8'd22,8'h0F); //IMMEDIATE VALUE 
+        load_instruction_memory(8'd23,8'hC6); //LDD R2, #0x0B
+        load_instruction_memory(8'd24,8'h0B); //IMM
+        load_instruction_memory(8'd25,8'hC8); //STD R0, #0x0C 
+        load_instruction_memory(8'd26,8'h0C); //IMM
+        load_instruction_memory(8'd27,8'hD8); //LDI R2, R0 
+        load_instruction_memory(8'd28,8'hE6); //STI R1, R2
+
+        load_instruction_memory(8'd139,8'h50); //DATA MEM[0B] = 50h
+        load_instruction_memory(8'd178,8'h40); //DATA MEM[50] = 40h
+
 
         initialize_test();
         initialize_regfile();
@@ -345,7 +357,9 @@ endtask
         $display("  STARTING INSTRUCTION TESTS");
         $display("========================================\n");
 
-
+        //==================================================================
+        // A-FORMAT TEST CASES
+        //==================================================================
         // TEST 0: Reset
         $display("--- TEST 0: RESET ---");
         check_PC(8'h02, "Reset loads PC from M[0]");
@@ -435,7 +449,7 @@ endtask
         // TEST NEG
         $display("\n--- TEST 13: NEG ---");
         wait_cycles(1);
-        check_register(2'b00, 8'hAB, "NEG R0 (Two's complement of 0x54 = 0xAC )");
+        check_register(2'b00, 8'hAB, "NEG R0 (Two's complement of 0x55 = 0xAB )");
 
         //TEST INC 
         $display("\n--- TEST 14: INC ---");
@@ -446,6 +460,36 @@ endtask
         $display("\n--- TEST 15: DEC ---");
         wait_cycles(1);
         check_register(2'b10, 8'h82, "DEC R2 (83-1=82)");
+
+        //==================================================================
+        // L-FORMAT TEST CASES
+        //==================================================================
+
+        //TEST LDM
+        $display("\n--- TEST 16: LDM ---");
+        wait_cycles(2);
+        check_register(2'b01, 8'h0F, "LDM R1, #0x0F");
+
+        //TEST LDD
+        $display("\n--- TEST 17: LDD ---");
+        wait_cycles(2);
+        check_register(2'b10, 8'h50, "LDD R2, (DATA_MEM[0B]=8'h50)");
+
+        //TEST STD M[12] = R0 = AB
+        $display("\n--- TEST 18: STD ---");
+        wait_cycles(2);
+        check_memory(8'h0C, 8'hAB, "STD MEM[0C], R0 (DATA_MEM[0C]=AB)"); 
+
+        //TEST LDI  R(rb)= M[R(ra)]     ra=2  rb=0 ->   R2=50  R0= M[50] = 40
+        $display("\n--- TEST 19: LDI ---");
+        wait_cycles(1);
+        check_register(2'b00, 8'h40, "LDI R0, ( DATA_MEM[7B]=40)");
+
+        //TEST STI  M[R(ra)] = R(rb)   ra=1  rb=2 -> R1=60  R2=50  MEM[60]=50
+        $display("\n--- TEST 20: STI ---");
+        wait_cycles(1);
+        check_memory(8'h60, 8'h50, "STI MEM[60], R1 (MEM[60]=50)");
+        
 
         wait_cycles(5);
         print_summary();
