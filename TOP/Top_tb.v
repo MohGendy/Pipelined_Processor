@@ -316,10 +316,21 @@ endtask
         clear_memory();
         load_instruction_memory(8'd0,8'd2);
         load_instruction_memory(8'd1,8'd110);
-        load_instruction_memory(8'd2,8'h21); //ADD R0,R1
-        load_instruction_memory(8'd3,8'h19); //MOV R2,R1
-        load_instruction_memory(8'd4,8'h31); //SUB R0,R1
-        load_instruction_memory(8'd5,8'h49); //AND R2,R1
+        load_instruction_memory(8'd2,8'h21);  //ADD R0,R1
+        load_instruction_memory(8'd3,8'h19);  //MOV R2,R1
+        load_instruction_memory(8'd4,8'h31);  //SUB R0,R1
+        load_instruction_memory(8'd5,8'h49);  //AND R2,R1
+        load_instruction_memory(8'd6,8'h59);  //OR R2,R1
+        load_instruction_memory(8'd7,8'h60);  //RLC R0
+        load_instruction_memory(8'd8,8'h66);  //RRC R2  
+        load_instruction_memory(8'd9,8'h68);  //SETC 1000
+        load_instruction_memory(8'd10,8'h6C); //CLRC 1100
+        load_instruction_memory(8'd11,8'h78); //OUT R0 1000
+        load_instruction_memory(8'd12,8'h7D); //IN R1 1101
+        load_instruction_memory(8'd13,8'h82); //NOT R2  0010
+        load_instruction_memory(8'd14,8'h84); //NEG R0  0100
+        load_instruction_memory(8'd15,8'h89); //INC R1  1001
+        load_instruction_memory(8'd16,8'h8E); //DEC R2  1110
 
         initialize_test();
         initialize_regfile();
@@ -339,13 +350,13 @@ endtask
         // TEST 1: ADD 
         $display("\n--- TEST 1: ADD ---");
         check_PC(8'h03, "ADD INCREMENTS PC");
-        wait_cycles(1);
+        wait_cycles(2);
 
-        wait_cycles(1);
         check_flag(2'b00, 1'b0, "ADD Z flag");
         check_flag(2'b10, 1'b1, "ADD C flag");
         wait_cycles(1);
         check_register(2'b00, 8'h01, "ADD R0, R1 (255+2=1 & C_flag=1)");
+        
 
         // TEST 2: MOV 
         $display("\n--- TEST 2: MOV ---");
@@ -359,22 +370,78 @@ endtask
         wait_cycles(1);
         check_register(2'b00, 8'hFF, "SUB R0, R1 (1-2=-1)");
         
+        
         // TEST 4: AND 
         $display("\n--- TEST 4: AND ---");
         wait_cycles(1);
         check_register(2'b10, 8'h02, "AND R0, R1 (2 & 2 = 2)");
-
-        // // TEST 2: MOV R1, R0
-        // $display("\n--- TEST 2: MOV R1, R0 ---");
-        // clear_memory();
-        // load_instruction_memory(8'h00, 8'h10); // Reset vector to 0x10
-        // uut.regfile.file[0] = 8'h42;  // R0 = 0x42
-        // load_instruction_memory(8'h10, 8'h14); // MOV R1, R0
-        // apply_reset(3);
-        // wait_cycles(6);
-        // check_register(2'b01, 8'h42, "MOV R1, R0");
-        // check_PC(8'h11, "MOV increments PC");
         
+        //TEST OR 
+        $display("\n--- TEST 5: OR ---");
+        uut.regFile.file[1] = 8'h02;
+        uut.regFile.file[2] = 8'h05;
+        wait_cycles(1);
+        check_register(2'b10, 8'h07, "OR R2, R1 (2 | 5 = 7)");
+
+        //TEST RLC
+        $display("\n--- TEST 6: RLC ---");
+        uut.regFile.file[0] = 8'hAA; //10101010
+        check_flag(2'b10, 1'b1, "RLC C flag (MSB was 1)");
+        wait_cycles(1);
+        check_register(2'b00, 8'h54, "RLC R0 (10101010 -> 01010100)");
+        
+
+        //TEST RRC
+        $display("\n--- TEST 7: RRC ---");
+        uut.regFile.file[2] = 8'hAA; //10101010
+        check_flag(2'b10, 1'b0, "RRC C flag (LSB was 0)");
+        wait_cycles(1);
+        check_register(2'b10, 8'h55, "RRC R2 (10101010 -> 01010101)");
+        
+
+        //TEST SETC
+        $display("\n--- TEST 8: SETC ---");
+        wait_cycles(1);
+        check_flag(2'b10, 1'b1, "SETC sets C flag");
+
+        //TEST CLRC
+        $display("\n--- TEST 9: CLRC ---");
+        check_flag(2'b10, 1'b0, "CLRC clears C flag");
+        wait_cycles(1);
+        
+
+        //TEST OUT
+        $display("\n--- TEST 10: OUT ---");
+        uut.regFile.file[0] = 8'hAB;
+        wait_cycles(1);
+        check_output_port(8'hAB, "OUT R0 sends 0xAB to Out_port");
+
+        //TEST IN
+        $display("\n--- TEST 11: IN ---");
+        In_port = 8'hCD;  
+        wait_cycles(1); 
+        check_register(2'b01, 8'hCD, "IN R1 receives 0xCD from In_port");
+
+        // TEST NOT
+        $display("\n--- TEST 12: NOT ---");
+        wait_cycles(1);
+        check_register(2'b10, 8'hAA, "NOT R2 ( ~(01010101) = 10101010 )");
+
+        // TEST NEG
+        $display("\n--- TEST 13: NEG ---");
+        wait_cycles(1);
+        check_register(2'b00, 8'h55, "NEG R0 (Two's complement of 0xAB = 0x55)");
+
+        //TEST INC 
+        $display("\n--- TEST 14: INC ---");
+        wait_cycles(1);
+        check_register(2'b01, 8'hCE, "INC R1 (CD+1=CE)");
+
+        //TEST DEC
+        $display("\n--- TEST 15: DEC ---");
+        wait_cycles(1);
+        check_register(2'b01, 8'hA9, "DEC R2 (AA-1=A9)");
+
          wait_cycles(5);
          print_summary();
          $stop;
