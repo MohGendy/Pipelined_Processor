@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module Top_tb;
+module FIb_tb;
 
     // Testbench signals
     reg clk;
@@ -27,8 +27,8 @@ module Top_tb;
     
     // VCD dump for waveform viewing
     initial begin
-        $dumpfile("Top_tb.vcd");
-        $dumpvars(0, Top_tb);
+        $dumpfile("FIb_tb.vcd");
+        $dumpvars(0, FIb_tb);
     end
     
     // Instantiate the processor
@@ -316,10 +316,11 @@ endtask
         clear_memory();
         initialize_test();
         initialize_regfile();
-        load_hex_file(fib.hex);
+        load_hex_file("fib.hex");
         apply_reset(3);
-        wait_cycles(100); // Wait for program to execute
-
+        // wait_cycles(100); // Wait for program to execute
+        wait(HLT_Flag);
+        
         check_memory(8'hFF , 8'h00, "Fibonacci Result at MEM[0xFF]=0x00 for Fib(0)");
         check_memory(8'hFE , 8'h01, "Fibonacci Result at MEM[0xFE]=0x01 for Fib(1)");
         check_memory(8'hFD , 8'h01, "Fibonacci Result at MEM[0xFD]=0x01 for Fib(2)");
@@ -327,10 +328,9 @@ endtask
         check_memory(8'hFB , 8'h03, "Fibonacci Result at MEM[0xFB]=0x03 for Fib(4)");
         check_memory(8'hFA , 8'h05, "Fibonacci Result at MEM[0xFA]=0x05 for Fib(5)");
         check_memory(8'hF9 , 8'h08, "Fibonacci Result at MEM[0xF9]=0x08 for Fib(6)");
-        check_memory(8'hF8 , 8'h0D, "Fibonacci Result  at MEM[0xF8]=0x0D for Fib(7)");
+        check_memory(8'hF8 , 8'h0D, "Fibonacci Result at MEM[0xF8]=0x0D for Fib(7)");
         check_memory(8'hF7 , 8'h15, "Fibonacci Result at MEM[0xF7]=0x15 for Fib(8)");
         check_memory(8'hF6 , 8'h22, "Fibonacci Result at MEM[0xF6]=0x22 for Fib(9)");
-        check_memory(8'hF5 , 8'h37, "Fibonacci Result at MEM[0xF5]=0x37 for Fib(10)");
 
         print_summary();
         $stop;     

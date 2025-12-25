@@ -587,14 +587,14 @@ endtask
 
         // TEST : JMP
         $display("\n--- TEST 25: JMP ---");
-        wait_cycles(9);
+        wait_cycles(7);
         check_PC(8'h1F, "JMP to R2");
 
         // TEST : CALL and RET
         $display("\n--- TEST 26: CALL and RET ---");
-        wait_cycles(6);
-        check_PC(8'h25, "After CALL, PC should be 0x37d");
         wait_cycles(4);
+        check_PC(8'h25, "After CALL, PC should be 0x37d");
+        wait_cycles(5);
         check_PC(8'h22, "After RET, PC should be 0x34d");
 
         wait_cycles(5);
