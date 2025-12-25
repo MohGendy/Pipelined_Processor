@@ -371,6 +371,7 @@ add wave -noupdate -expand -group Excute /interrupt_tb/uut/Carry_Flag_OUT
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/Overflow
 add wave -noupdate -expand -group Excute -radix hexadecimal /interrupt_tb/uut/Res_EX
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/CCR_out
+add wave -noupdate -expand -group Excute /interrupt_tb/uut/CCReg/CCR
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/flush
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/has_hazard_Ex
 add wave -noupdate -divider {EX to M Latch}
