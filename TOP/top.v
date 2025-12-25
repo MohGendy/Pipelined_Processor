@@ -582,6 +582,7 @@ module top (
             .rst            (rst            ),
             .in_port        (In_port        ),
             .intr           (int            ),
+            .inter_en       (~Int_en        ),
             .out_en         (out_ld_Wb      ),
             .HLT_en         (Hlt_en_Wb      ),
             .data_from_cpu  (DataOut_Wb     ),

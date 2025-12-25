@@ -1,48 +1,5 @@
 ; code for test , edit this file and add your own code
-LDM R0, 0x00
-LDM R1, 0x01
+SUB R1, R1
+OR R2, R1
+RTI
 
-push R0
-NOP
-NOP
-push R1
-
-LDM R2, 0x77
-NOP
-ADD R0, R1
-PUSH R0
-NOP
-ADD R1, R0
-PUSH R1
-NOP
-NOP
-SUB R2, R3
-LDM R2, 0x0A
-JN  R2
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP
-NOP

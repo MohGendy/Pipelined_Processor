@@ -87,7 +87,7 @@ always @(*) begin
             int_clr  = 1'b1;
         end
 
-        if (!intr && reset)  
+        if (reset)  
             next_state = S_FETCH1;
         else 
             next_state = S_RESET_INTER;
@@ -130,9 +130,9 @@ always @(*) begin
 
             if (two_byte)
                 next_state = S_FETCH2;
-            else if (branch_taken || (opcode == 4'd11 && brx < 2)) // Loop taken or JZ , JC , JV , JN taken or JMP/CALL
+            else if (branch_taken || (opcode == 4'd11 && ~brx[1] )) // Loop taken or JZ , JC , JV , JN taken or JMP/CALL
                 next_state = S_FETCH1;
-            else if (opcode == 4'd11 && brx >= 2) // RET/RTI
+            else if (opcode == 4'd11 && brx[1]) // RET/RTI
                 next_state = S_WAIT;
             else
                 next_state = S_FETCH1;

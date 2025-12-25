@@ -323,8 +323,8 @@ endtask
         load_instruction_memory(8'd05,8'h36);  //SUB R1,R2
 
         load_instruction_memory(8'hB0,8'h35);  //SUB R1,R1
-        load_instruction_memory(8'd03,8'h59);  //OR  R2,R1
-        load_instruction_memory(8'd04,8'hBC);  //RTI
+        load_instruction_memory(8'hB1,8'h59);  //OR  R2,R1
+        load_instruction_memory(8'hB2,8'hBC);  //RTI
        
 
         initialize_test();
@@ -341,6 +341,7 @@ endtask
         // TEST 0: Reset
         $display("--- TEST 0: RESET ---");
         check_PC(8'h02, "Reset loads PC from M[0]");
+        interrupt = 1'b1 ; //rise interrrupt
         wait_cycles(1);
 
 
@@ -349,10 +350,12 @@ endtask
         wait_cycles(2);
         check_register(2'b10, 8'h0F, "LDM R2, 0x05");
 
+        
+        
         // TEST 2: ADD R1, R2
         $display("\n--- TEST 2: ADD ---");
-        interrupt = 1'b1 ; //rise interrrupt
         wait_cycles(2);
+        
 
         check_PC(8'hB0, "interrupt jumbs to the ISR");
 
