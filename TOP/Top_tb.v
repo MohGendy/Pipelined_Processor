@@ -597,7 +597,6 @@ endtask
         wait_cycles(2);
         check_PC(8'h22, "After RET, PC should be 0x34d");
 
-
         wait_cycles(5);
         print_summary();
         $stop;
