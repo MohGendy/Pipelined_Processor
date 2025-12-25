@@ -343,6 +343,21 @@ endtask
         load_instruction_memory(8'd26,8'h0C); //IMM
         load_instruction_memory(8'd27,8'hD8); //LDI R2, R0 
         load_instruction_memory(8'd28,8'hE6); //STI R1, R2
+        load_instruction_memory(8'd29,8'h91); //JZ R1
+        load_instruction_memory(8'd30,8'h00); //NOP
+        load_instruction_memory(8'd31,8'h00); //NOP
+        load_instruction_memory(8'd32,8'h68); //SETC
+        load_instruction_memory(8'd33,8'h98); //JC R0 
+        load_instruction_memory(8'd40,8'h00);  //NOP
+        load_instruction_memory(8'd41,8'h00);  //NOP
+        load_instruction_memory(8'd42,8'h00);  //NOP
+        load_instruction_memory(8'd43,8'h00);  //NOP
+        load_instruction_memory(8'd44,8'h26); //ADD R1,R2
+        load_instruction_memory(8'd45,8'h9D);  //JV R1
+        load_instruction_memory(8'd80,8'h00);  //NOP
+        load_instruction_memory(8'd81,8'h96);  //JN R2  
+
+
 
         load_instruction_memory(8'd139,8'h50); //DATA MEM[0B] = 50h
         load_instruction_memory(8'd178,8'h40); //DATA MEM[50] = 40h
@@ -490,6 +505,38 @@ endtask
         wait_cycles(1);
         check_memory(8'h60, 8'h50, "STI MEM[60], R1 (MEM[60]=50)");
         
+        //==================================================================
+        // B-FORMAT TEST CASES
+        //==================================================================
+        //TEST JZ
+        $display("\n--- TEST 21: JZ ---");
+        check_PC(8'h32, "JZ to R1 (Should NOT jump as Z=0)");
+
+        // SETC
+        // To set C flag for JC test
+        //TEST JC
+        wait_cycles(3);
+        check_PC(8'h40, "JC to R0 (Should jump as C=1)");
+
+        uut.regFile.file[1] = 8'h7F;
+        uut.regFile.file[2] = 8'h01;
+        wait_cycles(4); //NOPs
+
+        // ADD R1, R2 
+        // TO set V flag for JV test
+        //TEST JV
+        $display("\n--- TEST 22: JV ---");
+        wait_cycles(4);
+        check_PC(8'h80, "JV to R1 (Should jump as V=1)");
+
+
+
+
+
+
+
+
+
 
         wait_cycles(5);
         print_summary();
