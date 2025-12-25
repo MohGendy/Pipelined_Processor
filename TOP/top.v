@@ -96,8 +96,11 @@ module top (
     wire SE2_Ex     ;
     wire [1:0] SE3_Ex     ;
     wire Hlt_en_Ex        ;
+    wire [1:0] has_hazard;
 
     wire [1:0] SHD;
+    wire [1:0] has_hazard_Ex;
+    
     
 //? Excute 
 
@@ -325,7 +328,8 @@ module top (
         .pc_src             (pc_src             ),
         .addr_src           (addr_src           ), 
         .int_clr            (int_clr            ),
-        .Int_en             (Int_en             )
+        .Int_en             (Int_en             ),
+        .has_hazard         (has_hazard         )
     );
 
     D_Ex_Latch u_D_Ex_Latch(
@@ -347,7 +351,7 @@ module top (
         .in_SE2    (SE2       ),
         .in_SE3    (SE3       ),
         .in_Hlt    (HLT_en    ),
-
+        .in_has_hazard(has_hazard),
         .clk       (clk       ),
         .reset     (rst       ),
         .ld        (ld_D_Ex   ),
@@ -369,7 +373,9 @@ module top (
         .BU        (BU_Ex        ),
         .SE2       (SE2_Ex       ),
         .SE3       (SE3_Ex       ),
-        .Hlt       (Hlt_en_Ex    )
+        .Hlt       (Hlt_en_Ex    ),
+        .has_hazard(has_hazard_Ex)
+
     );
 
     bypass_jmp u_bypass_jmp(
@@ -515,7 +521,8 @@ module top (
         .sw2_wb    (SW2_Wb    ),
         .stall     (stall     ),
         .forward_a (SHA       ),
-        .forward_b (SHB       )
+        .forward_b (SHB       ),
+        .has_hazard(has_hazard_Ex)
     );
 
 //? Memory
