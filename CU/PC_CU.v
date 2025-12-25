@@ -10,6 +10,8 @@ module Fetch_Stage_CU (
     output reg         pc_en,
     output reg         pc_load,
     output reg         stall,
+    output reg         flush_next,
+
     output reg         sf1, // 0 always (inst data) , 1 Int (pc)
     output reg [1:0]   pc_src,
     output reg [1:0]   addr_src,
@@ -26,6 +28,8 @@ reg [1:0]   counter;
 reg [2:0] state, next_state;
 reg two_byte;
 reg pc_was_loaded;  // Track if PC was loaded in previous state
+
+reg [1:0] next_counter ;
 
 always @(*) begin
     two_byte = (opcode == 4'd12); // LDM, LDD, STD
@@ -51,9 +55,9 @@ always @(posedge clk or negedge reset) begin
     if (!reset || intr) 
         counter <= 2'b00;
     else
-    if (state == S_WAIT &! stall_in)
-        counter <= counter + 1;
-    else if (state == S_WAIT && stall_in)
+    if (state == S_FETCH1 &! stall_in)
+        counter <= next_counter;
+    else if (state == S_FETCH1 && stall_in)
         counter <= counter;
     else 
         counter <= 2'b00;
@@ -69,6 +73,8 @@ always @(*) begin
     next_state = state;
     sf1        = 1'b0;
     int_clr    = 1'b0;
+    next_counter = 2'b0 ;
+    flush_next   = 1'b0 ;
 
     case (state)
     // ===== RESET OR INTERRUPT =====
@@ -94,6 +100,7 @@ always @(*) begin
     end
     // ===== FETCH =====
     S_FETCH1: begin
+
         // ----- Conditional Branches & LOOP -----
         if (branch_taken) begin //!
             pc_load = 1;
@@ -103,10 +110,24 @@ always @(*) begin
         end
         // ----- RET / RTI -----
         else if (opcode == 4'd11 && brx >= 2) begin //!
-            pc_load = 1;
-            pc_en = 1;
-            pc_src  = 2'b11; // data_out
-            next_state = S_FETCH1;
+            stall = 1'b1;
+            flush_next = 1'b1 ;
+            if (counter == 2'b10) begin
+                stall      = 1'b0;
+                pc_load = 1;
+                pc_en = 1;
+                pc_src  = 2'b11; // data_out
+                next_state = S_FETCH1;
+                next_counter = 2'b0 ;
+            end
+            else begin
+                next_counter = counter + 2'b1 ;
+            end
+
+            if (counter == 2'b0) begin
+                flush_next = 1'b0 ;
+            end
+
         end
         // ----- JMP / CALL -----
         else if (opcode == 4'd11 && brx < 2) begin 
@@ -130,10 +151,6 @@ always @(*) begin
 
             if (two_byte)
                 next_state = S_FETCH2;
-            else if (branch_taken || (opcode == 4'd11 && ~brx[1] )) // Loop taken or JZ , JC , JV , JN taken or JMP/CALL
-                next_state = S_FETCH1;
-            else if (opcode == 4'd11 && brx[1]) // RET/RTI
-                next_state = S_WAIT;
             else
                 next_state = S_FETCH1;
             
@@ -145,19 +162,7 @@ always @(*) begin
         pc_en    = 1;
         next_state = S_FETCH1;
     end
-    // ===== WAIT STATE FOR MEM OPS =====
-    S_WAIT: begin
-        // Simple 2-cycle wait for memory (for RET/RTI)
-        stall = 1'b1;
-        if (counter == 2'b10) begin
-            stall      = 1'b0;
-            next_state = S_FETCH1;
-        end
-        else begin
-            next_state = S_WAIT;
-        end
-
-    end
+    
     default: begin
         pc_en      = 0;
         pc_load    = 0;

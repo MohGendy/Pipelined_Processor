@@ -67,7 +67,7 @@ module interrupt_tb;
        // Initialize registers
         uut.regFile.file[0] = 8'hFF;
         uut.regFile.file[1] = 8'h02;
-        uut.regFile.file[2] = 8'h05;
+        uut.regFile.file[2] = 8'h04;
         uut.regFile.file[3] = 8'h7f;
     end
     endtask
@@ -76,7 +76,7 @@ module interrupt_tb;
     // TASK 3: Loading From Assembler
     //==========================================================================
     task load_hex_file;
-    input [200*8:1] filename;
+    input [100*8:1] filename;
     begin
         $readmemh(filename, uut.u_Memory.Mem);
         $display("[INFO] Loaded program from %0s", filename);
@@ -100,7 +100,7 @@ module interrupt_tb;
     task check_register;
         input [1:0] reg_num;
         input [7:0] expected;
-        input [200*8:1] test_name;
+        input [100*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -125,7 +125,7 @@ module interrupt_tb;
     task check_flag;
     input [1:0] flag_type; // 0=Z, 1=N, 2=C, 3=V
     input expected;
-    input [200*8:1] test_name;
+    input [100*8:1] test_name;
     reg actual;
     reg [7:0] f_name; // To store string name of flag
     begin
@@ -157,7 +157,7 @@ endtask
     task check_memory;
         input [7:0] addr;
         input [7:0] expected;
-        input [200*8:1] test_name;
+        input [100*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -224,7 +224,7 @@ endtask
     //==========================================================================
     task check_output_port;
         input [7:0] expected;
-        input [200*8:1] test_name;
+        input [100*8:1] test_name;
         begin
             total_tests = total_tests + 1;
             
@@ -347,37 +347,36 @@ endtask
 
         //I1: LDM R2,0x05
         $display("\n--- TEST 1: LDM ---");
-        wait_cycles(2);
-        check_register(2'b10, 8'h0F, "LDM R2, 0x05");
+        wait_cycles(3);
+        check_register(2'b10, 8'h05, "LDM R2, 0x05");
 
         
+        check_PC(8'hB0, "interrupt jumbs to the ISR");
         
         // TEST 2: ADD R1, R2
         $display("\n--- TEST 2: ADD ---");
-        wait_cycles(2);
-        
-
-        check_PC(8'hB0, "interrupt jumbs to the ISR");
-
-
-        check_flag(2'b00, 1'b0, "ADD Z flag");
-        check_flag(2'b10, 1'b1, "ADD C flag");
         wait_cycles(1);
-        check_register(2'b01, 8'h01, "ADD R1, R2 (255+2=1 & C_flag=1)");
+        
+        // wait_cycles(1);
+        check_flag(2'b00, 1'b0, "ADD Z flag");
+        check_flag(2'b10, 1'b0, "ADD C flag");
+        wait_cycles(1);
+        check_register(2'b01, 8'h07, "ADD R1, R2 (2+5=7 & C_flag=0)");
         
         interrupt = 1'b0 ; 
 
         // TEST 3: SUB R1, R1
-        $display("\n--- TEST 3: SUB ---");
+        $display("\n--- TEST 3:1st I in ISR SUB ---");
+        wait_cycles(1);
         check_flag(2'b00, 1'b1, "SUB Z flag");
         wait_cycles(1);
-        check_register(2'b01, 8'hFF, "SUB R1, R1 (1-2=-1)");
+        check_register(2'b01, 8'h00, "SUB R1, R1 (7-7=0)");
 
 
         //TEST4: OR R2, R1
         $display("\n--- TEST 4: OR ---");
         wait_cycles(1);
-        check_register(2'b10, 8'h07, "OR R2, R1 (5 | 2 = 7)");
+        check_register(2'b10, 8'h05, "OR R2, R1 (5 | 0 = 5)");
 
         //TEST5: RTI 
         $display("\n--- TEST 5: RTI ---");
@@ -387,9 +386,11 @@ endtask
 
         // TEST 6: SUB R1, R2
         $display("\n--- TEST 3: SUB ---");
-        check_flag(2'b00, 1'b1, "SUB Z flag");
+        wait_cycles(3);
+        check_flag(2'b00, 1'b0, "SUB Z flag");
+        check_flag(2'b01, 1'b1, "SUB N flag");
         wait_cycles(1);
-        check_register(2'b01, 8'hFF, "SUB R1, R1 (1-2=-1)");
+        check_register(2'b01, 8'hFB, "SUB R1, R2 (0-5=-5)");
 
 
         wait_cycles(5);

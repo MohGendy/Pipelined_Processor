@@ -279,6 +279,10 @@ add wave -noupdate -expand -group TB /interrupt_tb/total_tests
 add wave -noupdate -divider CU
 add wave -noupdate -expand -group CU -radix PC_FSM_radix /interrupt_tb/uut/u_Control_Unit/PC_CU/state
 add wave -noupdate -expand -group CU -radix PC_FSM_radix /interrupt_tb/uut/u_Control_Unit/PC_CU/next_state
+
+add wave -noupdate -expand -group CU -radix unsigned /interrupt_tb/uut/u_Control_Unit/PC_CU/next_counter
+add wave -noupdate -expand -group CU -radix unsigned /interrupt_tb/uut/u_Control_Unit/PC_CU/counter
+
 add wave -noupdate -divider Fetch
 add wave -noupdate -expand -group Fetch /interrupt_tb/uut/pc_src
 add wave -noupdate -expand -group Fetch -radix hexadecimal /interrupt_tb/uut/reg_rb_d
@@ -367,6 +371,7 @@ add wave -noupdate -expand -group Excute /interrupt_tb/uut/Carry_Flag_OUT
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/Overflow
 add wave -noupdate -expand -group Excute -radix hexadecimal /interrupt_tb/uut/Res_EX
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/CCR_out
+add wave -noupdate -expand -group Excute /interrupt_tb/uut/CCReg/CCR
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/flush
 add wave -noupdate -expand -group Excute /interrupt_tb/uut/has_hazard_Ex
 add wave -noupdate -divider {EX to M Latch}

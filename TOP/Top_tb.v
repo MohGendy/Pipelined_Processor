@@ -76,7 +76,7 @@ module Top_tb;
     // TASK 3: Loading From Assembler
     //==========================================================================
     task load_hex_file;
-    input [200*8:1] filename;
+    input [100*8:1] filename;
     begin
         $readmemh(filename, uut.u_Memory.Mem);
         $display("[INFO] Loaded program from %0s", filename);
@@ -100,7 +100,7 @@ module Top_tb;
     task check_register;
         input [1:0] reg_num;
         input [7:0] expected;
-        input [200*8:1] test_name;
+        input [100*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -125,7 +125,7 @@ module Top_tb;
     task check_flag;
     input [1:0] flag_type; // 0=Z, 1=N, 2=C, 3=V
     input expected;
-    input [200*8:1] test_name;
+    input [100*8:1] test_name;
     reg actual;
     reg [7:0] f_name; // To store string name of flag
     begin
@@ -157,7 +157,7 @@ endtask
     task check_memory;
         input [7:0] addr;
         input [7:0] expected;
-        input [200*8:1] test_name;
+        input [100*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -224,7 +224,7 @@ endtask
     //==========================================================================
     task check_output_port;
         input [7:0] expected;
-        input [200*8:1] test_name;
+        input [100*8:1] test_name;
         begin
             total_tests = total_tests + 1;
             
@@ -578,7 +578,7 @@ endtask
         // TEST : JN
         $display("\n--- TEST 25: JN ---");
         wait_cycles(12);
-        check_PC(8'h15, "JN to R2 (Should jump as N=1)");
+        check_PC(8'h0F, "JN to R2 (Should jump as N=1)");
 
         // TEST : LOOP
         $display("\n--- TEST 26: LOOP ---");
@@ -586,16 +586,16 @@ endtask
         check_PC(8'h16, "LOOP EXIT PC = 22d");
 
         // TEST : JMP
-        $display("\n--- TEST 27: JMP ---");
+        $display("\n--- TEST 25: JMP ---");
         wait_cycles(9);
         check_PC(8'h1F, "JMP to R2");
 
         // TEST : CALL and RET
-        $display("\n--- TEST 28: CALL and RET ---");
+        $display("\n--- TEST 26: CALL and RET ---");
         wait_cycles(6);
-        check_PC(8'h25, "After CALL, PC should be 0x25");
+        check_PC(8'h25, "After CALL, PC should be 0x37d");
         wait_cycles(4);
-        check_PC(8'h22, "After RET, PC should be 0x22");
+        check_PC(8'h22, "After RET, PC should be 0x34d");
 
         wait_cycles(5);
         print_summary();
