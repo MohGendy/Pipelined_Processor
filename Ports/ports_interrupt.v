@@ -7,6 +7,7 @@ input rst,  // reset (active Low)
 input [7:0] in_port,                   // data in  
 output reg [7:0] out_port,            // data out
 input intr,                          // external interrupt  
+input inter_en,                     //signal to allow entering interrupt 
 output reg HLT_flag ,                    // output flag = 1 when hlt , and 0 otherwise      
 /* INSIDE CPU ports interface */
 input out_en,                     // asserted when executing OUT instruction 
@@ -33,8 +34,8 @@ input intr_clear            // asserted to clear interrupt flag
         	if (out_en) out_port <= data_from_cpu;
 		
 		// Interrupt latching
-            if (intr) intr_flag <= 1'b1;
-            else if (intr_clear) intr_flag <= 1'b0;
+            if (intr_clear) intr_flag <= 1'b0;
+            else if (intr && inter_en) intr_flag <= 1'b1;
         
         // In port reading
             data_to_cpu <= in_port;
