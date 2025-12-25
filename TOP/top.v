@@ -213,7 +213,7 @@ module top (
     );
 
     PC u_PC( //:)
-        .clk     (clk &! HLT_en  ),
+        .clk     (clk &! Hlt_en_Ex  ),
         .pc_load (pc_load       ),
         .pc_en   (PC_en_assigned),
         .pc_in   (pc_in         ),
@@ -245,7 +245,7 @@ module top (
     );
 
     instruction_reg IR_u( //:)
-        .clk     (clk &! HLT_en  ),
+        .clk     (clk &! Hlt_en_Ex  ),
         .rst     (rst           ),
         .flush   (flush_IR      ),
         .ld      (ld_IR         ),
@@ -296,7 +296,7 @@ module top (
 //! CU
 
     Control_Unit u_Control_Unit(
-        .clk                (clk &! HLT_en      ),
+        .clk                (clk &! Hlt_en_Ex      ),
         .rst                (rst                ),
         .IR                 (IR                 ),
         .reg_sf1            (reg_sf1            ),
