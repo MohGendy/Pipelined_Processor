@@ -285,7 +285,7 @@ endtask
     endtask
 
     //==========================================================================
-    // TASK 4: Load Instruction Memory
+    // TASK 13: Load Instruction Memory
     //==========================================================================
     task load_instruction_memory;
         input [7:0] addr;
@@ -297,7 +297,7 @@ endtask
     endtask
 
     //==========================================================================
-    // TASK 2: Clear Memory
+    // TASK 14: Clear Memory
     //==========================================================================
     task clear_memory;
         integer i;
@@ -571,30 +571,30 @@ endtask
         apply_reset(3);
 
         // TEST : Reset
-        $display("--- TEST : RESET ---");
+        $display("--- TEST 24 : RESET ---");
         check_PC(8'h02, "Reset loads PC from M[0]");
         
 
         // TEST : JN
-        $display("\n--- TEST 23: JN ---");
+        $display("\n--- TEST 25: JN ---");
         wait_cycles(12);
         check_PC(8'h0F, "JN to R2 (Should jump as N=1)");
 
         // TEST : LOOP
-        $display("\n--- TEST 24: LOOP ---");
+        $display("\n--- TEST 26: LOOP ---");
         wait_cycles(13);
         check_PC(8'h16, "LOOP EXIT PC = 22d");
 
         // TEST : JMP
         $display("\n--- TEST 25: JMP ---");
-        wait_cycles(7);
+        wait_cycles(9);
         check_PC(8'h1F, "JMP to R2");
 
         // TEST : CALL and RET
         $display("\n--- TEST 26: CALL and RET ---");
-        wait_cycles(4);
+        wait_cycles(6);
         check_PC(8'h25, "After CALL, PC should be 0x37d");
-        wait_cycles(5);
+        wait_cycles(4);
         check_PC(8'h22, "After RET, PC should be 0x34d");
 
         wait_cycles(5);

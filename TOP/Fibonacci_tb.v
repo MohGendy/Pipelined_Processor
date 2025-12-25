@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module interrupt_tb;
+module Top_tb;
 
     // Testbench signals
     reg clk;
@@ -27,8 +27,8 @@ module interrupt_tb;
     
     // VCD dump for waveform viewing
     initial begin
-        $dumpfile("interrupt_tb.vcd");
-        $dumpvars(0, interrupt_tb);
+        $dumpfile("Top_tb.vcd");
+        $dumpvars(0, Top_tb);
     end
     
     // Instantiate the processor
@@ -67,7 +67,7 @@ module interrupt_tb;
        // Initialize registers
         uut.regFile.file[0] = 8'hFF;
         uut.regFile.file[1] = 8'h02;
-        uut.regFile.file[2] = 8'h04;
+        uut.regFile.file[2] = 8'h05;
         uut.regFile.file[3] = 8'h7f;
     end
     endtask
@@ -76,7 +76,7 @@ module interrupt_tb;
     // TASK 3: Loading From Assembler
     //==========================================================================
     task load_hex_file;
-    input [100*8:1] filename;
+    input [200*8:1] filename;
     begin
         $readmemh(filename, uut.u_Memory.Mem);
         $display("[INFO] Loaded program from %0s", filename);
@@ -100,7 +100,7 @@ module interrupt_tb;
     task check_register;
         input [1:0] reg_num;
         input [7:0] expected;
-        input [100*8:1] test_name;
+        input [200*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -125,7 +125,7 @@ module interrupt_tb;
     task check_flag;
     input [1:0] flag_type; // 0=Z, 1=N, 2=C, 3=V
     input expected;
-    input [100*8:1] test_name;
+    input [200*8:1] test_name;
     reg actual;
     reg [7:0] f_name; // To store string name of flag
     begin
@@ -157,7 +157,7 @@ endtask
     task check_memory;
         input [7:0] addr;
         input [7:0] expected;
-        input [100*8:1] test_name;
+        input [200*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -224,7 +224,7 @@ endtask
     //==========================================================================
     task check_output_port;
         input [7:0] expected;
-        input [100*8:1] test_name;
+        input [200*8:1] test_name;
         begin
             total_tests = total_tests + 1;
             
@@ -314,88 +314,25 @@ endtask
     //==========================================================================
     initial begin
         clear_memory();
-
-        load_instruction_memory(8'd00,8'd02);
-        load_instruction_memory(8'd01,8'hB0);  
-        load_instruction_memory(8'd02,8'hC2);  //LDM R2, 0x05
-        load_instruction_memory(8'd03,8'h05);  
-        load_instruction_memory(8'd04,8'h26);  //ADD R1,R2
-        load_instruction_memory(8'd05,8'h36);  //SUB R1,R2
-
-        load_instruction_memory(8'hB0,8'h35);  //SUB R1,R1
-        load_instruction_memory(8'hB1,8'h59);  //OR  R2,R1
-        load_instruction_memory(8'hB2,8'hBC);  //RTI
-       
-
         initialize_test();
         initialize_regfile();
+        load_hex_file(fib.hex);
         apply_reset(3);
-        
-        $display("\n========================================");
-        $display("  STARTING INSTRUCTION TESTS");
-        $display("========================================\n");
+        wait_cycles(100); // Wait for program to execute
 
-        //==================================================================
-        // A-FORMAT TEST CASES
-        //==================================================================
-        // TEST 0: Reset
-        $display("--- TEST 0: RESET ---");
-        check_PC(8'h02, "Reset loads PC from M[0]");
-        interrupt = 1'b1 ; //rise interrrupt
-        wait_cycles(1);
+        check_memory(8'hFF , 8'h00, "Fibonacci Result at MEM[0xFF]=0x00 for Fib(0)");
+        check_memory(8'hFE , 8'h01, "Fibonacci Result at MEM[0xFE]=0x01 for Fib(1)");
+        check_memory(8'hFD , 8'h01, "Fibonacci Result at MEM[0xFD]=0x01 for Fib(2)");
+        check_memory(8'hFC , 8'h02, "Fibonacci Result at MEM[0xFC]=0x02 for Fib(3)");
+        check_memory(8'hFB , 8'h03, "Fibonacci Result at MEM[0xFB]=0x03 for Fib(4)");
+        check_memory(8'hFA , 8'h05, "Fibonacci Result at MEM[0xFA]=0x05 for Fib(5)");
+        check_memory(8'hF9 , 8'h08, "Fibonacci Result at MEM[0xF9]=0x08 for Fib(6)");
+        check_memory(8'hF8 , 8'h0D, "Fibonacci Result  at MEM[0xF8]=0x0D for Fib(7)");
+        check_memory(8'hF7 , 8'h15, "Fibonacci Result at MEM[0xF7]=0x15 for Fib(8)");
+        check_memory(8'hF6 , 8'h22, "Fibonacci Result at MEM[0xF6]=0x22 for Fib(9)");
+        check_memory(8'hF5 , 8'h37, "Fibonacci Result at MEM[0xF5]=0x37 for Fib(10)");
 
-
-        //I1: LDM R2,0x05
-        $display("\n--- TEST 1: LDM ---");
-        wait_cycles(3);
-        check_register(2'b10, 8'h05, "LDM R2, 0x05");
-
-        
-        check_PC(8'hB0, "interrupt jumbs to the ISR");
-        
-        // TEST 2: ADD R1, R2
-        $display("\n--- TEST 2: ADD ---");
-        wait_cycles(1);
-        
-        // wait_cycles(1);
-        check_flag(2'b00, 1'b0, "ADD Z flag");
-        check_flag(2'b10, 1'b0, "ADD C flag");
-        wait_cycles(1);
-        check_register(2'b01, 8'h07, "ADD R1, R2 (2+5=7 & C_flag=0)");
-        
-        interrupt = 1'b0 ; 
-
-        // TEST 3: SUB R1, R1
-        $display("\n--- TEST 3:1st I in ISR SUB ---");
-        wait_cycles(1);
-        check_flag(2'b00, 1'b1, "SUB Z flag");
-        wait_cycles(1);
-        check_register(2'b01, 8'h00, "SUB R1, R1 (7-7=0)");
-
-
-        //TEST4: OR R2, R1
-        $display("\n--- TEST 4: OR ---");
-        wait_cycles(1);
-        check_register(2'b10, 8'h05, "OR R2, R1 (5 | 0 = 5)");
-
-        //TEST5: RTI 
-        $display("\n--- TEST 5: RTI ---");
-        wait_cycles(1);
-        check_PC(8'd05, "RTI returns to where it jumbed");
-
-
-        // TEST 6: SUB R1, R2
-        $display("\n--- TEST 3: SUB ---");
-        wait_cycles(3);
-        check_flag(2'b00, 1'b0, "SUB Z flag");
-        check_flag(2'b01, 1'b1, "SUB N flag");
-        wait_cycles(1);
-        check_register(2'b01, 8'hFB, "SUB R1, R2 (0-5=-5)");
-
-
-        wait_cycles(5);
         print_summary();
-        $stop;
-
+        $stop;     
     end
 endmodule
