@@ -27,7 +27,8 @@ module hazard_CU (
             6'b01101x,
             6'b011111,
             6'b101100,
-            6'b11000x
+            6'b11000x,
+            6'b1111xx
             : has_hazard = 2'b00;
                             //ab
             default: has_hazard = 2'b11;

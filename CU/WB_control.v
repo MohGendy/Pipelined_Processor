@@ -122,7 +122,7 @@ module Write_Back_Stage_CU(
                     sw1      = 1'b1;  // dest = rb
                     sw2      = 1'b0;
                 end
-                4'd15: begin //HLT  //! MISSING , logic to stop the CPU
+                4'd15: begin //HLT 
                     HLT_en = 1'b1 ;
                 end
                 default: begin

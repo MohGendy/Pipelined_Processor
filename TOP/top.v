@@ -175,7 +175,7 @@ module top (
 
     wire intr_in ;
 
-
+    wire HLT_out ;
 //! assigns
 
     assign RB_addr  = IR[1:0];
@@ -199,6 +199,8 @@ module top (
 
         assign bypass_decode_done = ~stall_d ; 
         assign PC_en_assigned = pc_en & ~stall & ~stall_d;
+
+        assign HLT = HLT_out ;
 //! modules instantiation
 //? fetch
     pc_in_mux u_pc_in_mux( //:)
@@ -211,11 +213,11 @@ module top (
     );
 
     PC u_PC( //:)
-        .clk     (clk     ),
-        .pc_load (pc_load ),
-        .pc_en   (PC_en_assigned ),
-        .pc_in   (pc_in   ),
-        .pc_out  (PC      )
+        .clk     (clk &! HLT_en  ),
+        .pc_load (pc_load       ),
+        .pc_en   (PC_en_assigned),
+        .pc_in   (pc_in         ),
+        .pc_out  (PC            )
     );
 
     mem_addr_mux u_mem_addr_mux( //:)
@@ -225,14 +227,14 @@ module top (
     );
 
     Memory u_Memory( //:)
-        .clk    (clk    ),
-        .rst    (rst    ),
-        .I_addr (I_addr ),
-        .D_addr (res_M  ),
-        .Wdata  (R_rb_M ), 
-        .WEn    (MW_M   ),
-        .I_data (I_data ), 
-        .D_data (D_data )
+        .clk    (clk &! Hlt_en_M ),
+        .rst    (rst            ),
+        .I_addr (I_addr         ),
+        .D_addr (res_M          ),
+        .Wdata  (R_rb_M         ), 
+        .WEn    (MW_M           ),
+        .I_data (I_data         ), 
+        .D_data (D_data         )
     );
 
     mux_2to1 MF1( //:)
@@ -243,29 +245,29 @@ module top (
     );
 
     instruction_reg IR_u( //:)
-        .clk     (clk     ),
-        .rst     (rst     ),
-        .flush   (flush_IR),
-        .ld      (ld_IR   ),
-        .sf1_in  (sf1     ),
-        .ir_new  (MF1_out ),
-        .reg_sf1 (reg_sf1 ),
-        .ir      (IR      )
+        .clk     (clk &! HLT_en  ),
+        .rst     (rst           ),
+        .flush   (flush_IR      ),
+        .ld      (ld_IR         ),
+        .sf1_in  (sf1           ),
+        .ir_new  (MF1_out       ),
+        .reg_sf1 (reg_sf1       ),
+        .ir      (IR            )
     );
 
 //? Decode 
 
     regfile regFile ( //:)
-        .clk     (clk      ),
-        .WE      (RW_Wb    ), 
-        .IncSP   (SP_Wb[1] ),
-        .DecSP   (SP_Wb[0] ),
-        .RA_addr (RA_addr  ),
-        .RB_addr (RB_addr  ),
-        .RW_addr (RW_addr  ),
-        .WD      (WD       ),
-        .RD_A    (RD_A     ),
-        .RD_B    (RD_B     )
+        .clk     (clk &! Hlt_en_Wb ),
+        .WE      (RW_Wb           ), 
+        .IncSP   (SP_Wb[1]        ),
+        .DecSP   (SP_Wb[0]        ),
+        .RA_addr (RA_addr         ),
+        .RB_addr (RB_addr         ),
+        .RW_addr (RW_addr         ),
+        .WD      (WD              ),
+        .RD_A    (RD_A            ),
+        .RD_B    (RD_B            )
     );
 
     mux_2to1 #(.size(2)) MD1 ( //:)
@@ -294,7 +296,7 @@ module top (
 //! CU
 
     Control_Unit u_Control_Unit(
-        .clk                (clk                ),
+        .clk                (clk &! HLT_en      ),
         .rst                (rst                ),
         .IR                 (IR                 ),
         .reg_sf1            (reg_sf1            ),
@@ -336,48 +338,48 @@ module top (
     );
 
     D_Ex_Latch u_D_Ex_Latch(
-        .in_ra     (RA_addr   ),
-        .in_rb     (RB_addr   ),
-        .in_R_ra   (in_RD_A_D ),
-        .in_R_rb   (in_RD_B_D ),
+        .in_ra          (RA_addr             ),
+        .in_rb          (RB_addr             ),
+        .in_R_ra        (in_RD_A_D           ),
+        .in_R_rb        (in_RD_B_D           ),
 
-        .in_RW     (write_en  ),
-        .in_SP     (in_SP     ),
-        .in_SW1    (sw1       ),
-        .in_SW2    (sw2       ),
-        .in_out_ld (ld_out    ),
-        .in_MW     (Wm        ),
-        .in_SM2    (SM2       ),
-        .in_ALU    (ALU_CONTROL),
-        .in_Flags  (flags_en  ),
-        .in_BU     (bu_op     ),
-        .in_SE2    (SE2       ),
-        .in_SE3    (SE3       ),
-        .in_Hlt    (HLT_en    ),
-        .in_has_hazard(has_hazard),
-        .clk       (clk       ),
-        .reset     (rst       ),
-        .ld        (ld_D_Ex   ),
-        .flush     (flush_D_Ex),
+        .in_RW          (write_en            ),
+        .in_SP          (in_SP               ),
+        .in_SW1         (sw1                 ),
+        .in_SW2         (sw2                 ),
+        .in_out_ld      (ld_out              ),
+        .in_MW          (Wm                  ),
+        .in_SM2         (SM2                 ),
+        .in_ALU         (ALU_CONTROL         ),
+        .in_Flags       (flags_en            ),
+        .in_BU          (bu_op               ),
+        .in_SE2         (SE2                 ),
+        .in_SE3         (SE3                 ),
+        .in_Hlt         (HLT_en              ),
+        .in_has_hazard  (has_hazard          ),
+        .clk            (clk &! Hlt_en_Ex    ),
+        .reset          (rst                 ),
+        .ld             (ld_D_Ex             ),
+        .flush          (flush_D_Ex          ),
 
-        .ra        (ra_Ex        ),
-        .rb        (rb_Ex        ),
-        .R_ra      (R_ra_Ex      ),
-        .R_rb      (R_rb_Ex      ),
-        .RW        (RW_Ex        ),
-        .SP        (SP_Ex        ),
-        .SW1       (SW1_Ex       ),
-        .SW2       (SW2_Ex       ),
-        .out_ld    (out_ld_Ex    ),
-        .MW        (MW_Ex        ),
-        .SM2       (SM2_Ex       ),
-        .ALU       (ALU_Ex       ),
-        .Flags     (Flags_Ex     ),
-        .BU        (BU_Ex        ),
-        .SE2       (SE2_Ex       ),
-        .SE3       (SE3_Ex       ),
-        .Hlt       (Hlt_en_Ex    ),
-        .has_hazard(has_hazard_Ex)
+        .ra             (ra_Ex               ),
+        .rb             (rb_Ex               ),
+        .R_ra           (R_ra_Ex             ),
+        .R_rb           (R_rb_Ex             ),
+        .RW             (RW_Ex               ),
+        .SP             (SP_Ex               ),
+        .SW1            (SW1_Ex              ),
+        .SW2            (SW2_Ex              ),
+        .out_ld         (out_ld_Ex           ),
+        .MW             (MW_Ex               ),
+        .SM2            (SM2_Ex              ),
+        .ALU            (ALU_Ex              ),
+        .Flags          (Flags_Ex            ),
+        .BU             (BU_Ex               ),
+        .SE2            (SE2_Ex              ),
+        .SE3            (SE3_Ex              ),
+        .Hlt            (Hlt_en_Ex           ),
+        .has_hazard     (has_hazard_Ex       )
 
     );
 
@@ -457,15 +459,15 @@ module top (
     );
 
     CCR CCReg(//:)
-        .clk       (clk         ),
-        .rst       (rst         ), 
-        .Flags_in  (flags_in    ), 
-        .intr_en   (Flags_Ex[4] ),            
-        .Z_Flag_en (Flags_Ex[3] ),    
-        .N_Flag_en (Flags_Ex[2] ),  
-        .C_Flag_en (Flags_Ex[1] ),  
-        .V_Flag_en (Flags_Ex[0] ),  
-        .Flags_out (CCR_out     )    
+        .clk       (clk &! Hlt_en_Ex    ),
+        .rst       (rst                 ), 
+        .Flags_in  (flags_in            ), 
+        .intr_en   (Flags_Ex[4]         ),            
+        .Z_Flag_en (Flags_Ex[3]         ),    
+        .N_Flag_en (Flags_Ex[2]         ),  
+        .C_Flag_en (Flags_Ex[1]         ),  
+        .V_Flag_en (Flags_Ex[0]         ),  
+        .Flags_out (CCR_out             )    
     );
 
     branch_unit BU(//:)
@@ -476,36 +478,36 @@ module top (
     );
 
     Ex_M_Latch u_Ex_M_Latch(
-        .in_ra     (ra_Ex     ),
-        .in_rb     (rb_Ex     ),
-        .in_R_rb   (RD_B_Ex   ),
-        .in_RW     (RW_Ex     ),
-        .in_SP     (SP_Ex     ),
-        .in_SW1    (SW1_Ex    ),
-        .in_SW2    (SW2_Ex    ),
-        .in_out_ld (out_ld_Ex ),
-        .in_MW     (MW_Ex     ),
-        .in_SM2    (SM2_Ex    ),
-        .in_res    (Res_EX    ),
-        .in_Hlt    (Hlt_en_Ex ),
+        .in_ra     (ra_Ex           ),
+        .in_rb     (rb_Ex           ),
+        .in_R_rb   (RD_B_Ex         ),
+        .in_RW     (RW_Ex           ),
+        .in_SP     (SP_Ex           ),
+        .in_SW1    (SW1_Ex          ),
+        .in_SW2    (SW2_Ex          ),
+        .in_out_ld (out_ld_Ex       ),
+        .in_MW     (MW_Ex           ),
+        .in_SM2    (SM2_Ex          ),
+        .in_res    (Res_EX          ),
+        .in_Hlt    (Hlt_en_Ex       ),
 
-        .clk       (clk       ),
-        .reset     (rst       ),
-        .ld        (ld_Ex_M   ),
-        .flush     (flush_Ex_M),
+        .clk       (clk &! Hlt_en_M ),
+        .reset     (rst             ),
+        .ld        (ld_Ex_M         ),
+        .flush     (flush_Ex_M      ),
 
-        .ra        (ra_M      ),
-        .rb        (rb_M      ),
-        .R_rb      (R_rb_M    ),
-        .RW        (RW_M      ),
-        .SP        (SP_M      ),
-        .SW1       (SW1_M     ),
-        .SW2       (SW2_M     ),
-        .out_ld    (out_ld_M  ),
-        .MW        (MW_M      ),
-        .SM2       (SM2_M     ),
-        .res       (res_M     ),
-        .Hlt       (Hlt_en_M  )
+        .ra        (ra_M            ),
+        .rb        (rb_M            ),
+        .R_rb      (R_rb_M          ),
+        .RW        (RW_M            ),
+        .SP        (SP_M            ),
+        .SW1       (SW1_M           ),
+        .SW2       (SW2_M           ),
+        .out_ld    (out_ld_M        ),
+        .MW        (MW_M            ),
+        .SM2       (SM2_M           ),
+        .res       (res_M           ),
+        .Hlt       (Hlt_en_M        )
     );
 
     hazard_forwarding_unit u_hazard_forwarding_unit( //:)
@@ -538,30 +540,30 @@ module top (
     );
 
     M_WB_Latch u_M_WB_Latch(
-        .in_ra      (ra_M       ),
-        .in_rb      (rb_M       ),
-        .in_RW      (RW_M       ),
-        .in_SP      (SP_M       ),
-        .in_SW1     (SW1_M      ),
-        .in_SW2     (SW2_M      ),
-        .in_out_ld  (out_ld_M   ),
-        .in_DataOut (DataOut    ),
-        .in_Hlt     (Hlt_en_M   ),
+        .in_ra      (ra_M               ),
+        .in_rb      (rb_M               ),
+        .in_RW      (RW_M               ),
+        .in_SP      (SP_M               ),
+        .in_SW1     (SW1_M              ),
+        .in_SW2     (SW2_M              ),
+        .in_out_ld  (out_ld_M           ),
+        .in_DataOut (DataOut            ),
+        .in_Hlt     (Hlt_en_M           ),
 
-        .clk        (clk        ),
-        .reset      (rst        ),
-        .ld         (ld_M_Wb    ),
-        .flush      (flush_M_Wb ),
+        .clk        (clk &! Hlt_en_Wb   ),
+        .reset      (rst                ),
+        .ld         (ld_M_Wb            ),
+        .flush      (flush_M_Wb         ),
 
-        .ra         (ra_Wb         ),
-        .rb         (rb_Wb         ),
-        .RW         (RW_Wb         ),
-        .SP         (SP_Wb         ),
-        .SW1        (SW1_Wb        ),
-        .SW2        (SW2_Wb        ),
-        .out_ld     (out_ld_Wb     ),
-        .DataOut    (DataOut_Wb    ),
-        .Hlt        (Hlt_en_Wb     )
+        .ra         (ra_Wb              ),
+        .rb         (rb_Wb              ),
+        .RW         (RW_Wb              ),
+        .SP         (SP_Wb              ),
+        .SW1        (SW1_Wb             ),
+        .SW2        (SW2_Wb             ),
+        .out_ld     (out_ld_Wb          ),
+        .DataOut    (DataOut_Wb         ),
+        .Hlt        (Hlt_en_Wb          )
     );
 
 //? Write back
@@ -581,7 +583,7 @@ module top (
     );
 
     ports_interrupt ports ( //:)
-            .clk            (clk            ),
+            .clk            (clk &! HLT_out ),
             .rst            (rst            ),
             .in_port        (In_port        ),
             .intr           (int            ),
@@ -592,7 +594,7 @@ module top (
             .intr_clear     (int_clr        ),
 
             .out_port       (Out_port       ),
-            .HLT_flag       (HLT            ),
+            .HLT_flag       (HLT_out        ),
             .data_to_cpu    (data_to_cpu    ),
             .intr_flag      (intr_in        )
         );
