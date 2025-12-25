@@ -149,8 +149,9 @@ assign ra = IR[3:2] ; //or brx
     );
     hazard_CU u_hazard_CU(
         .opcode     (op_code     ),
-        .ra         (ra         ),
-        .has_hazard (has_hazard )
+        .ra         (ra          ),
+        .sf1        (sf1         ),
+        .has_hazard (has_hazard  )
     );
     
     always @(posedge clk or negedge rst) begin
