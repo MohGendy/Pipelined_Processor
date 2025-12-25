@@ -193,7 +193,7 @@ module top (
         assign flush_D_Ex = (!stall) & (flush || stall_d) ;
 
         assign ld_IR      = (!stall) & (! stall_d) ;
-        assign flush_IR   = (!stall ) & (flush || stall_CU)   ;
+        assign flush_IR   = (!stall ) & (flush || stall_CU || ~SD2)   ; //* SD2 added to flush on immediate
 
         assign bypass_decode_done = ~stall_d ; 
         assign PC_en_assigned = pc_en & ~stall & ~stall_d;
@@ -475,7 +475,7 @@ module top (
     Ex_M_Latch u_Ex_M_Latch(
         .in_ra     (ra_Ex     ),
         .in_rb     (rb_Ex     ),
-        .in_R_rb   (R_rb_Ex   ),
+        .in_R_rb   (RD_B_Ex   ),
         .in_RW     (RW_Ex     ),
         .in_SP     (SP_Ex     ),
         .in_SW1    (SW1_Ex    ),

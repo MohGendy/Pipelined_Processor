@@ -47,13 +47,13 @@ always @(negedge clk) begin
         if (DecSP) begin
             // SP-- (Used by PUSH, CALL, Interrupt)
             // R3 value <- R3 value - 1
-            file[3] <= file[3] - 1; 
+            file[3] <= file[3] - 8'd1; 
         end
         
         else if (IncSP) begin
             // ++SP (Used by POP, RET, RTI)
             // R3 value <- R3 value + 1
-            file[3] <= file[3] + 1; 
+            file[3] <= file[3] + 8'd1; 
         end
     end
     else if(WE && RW_addr == 3'b11) begin
@@ -63,13 +63,13 @@ always @(negedge clk) begin
         if (DecSP) begin
             // SP-- (Used by PUSH, CALL, Interrupt)
             // R3 value <- R3 value - 1
-            file[3] <= file[3] - 1; 
+            file[3] <= file[3] - 8'd1; 
         end
         
         else if (IncSP) begin
             // ++SP (Used by POP, RET, RTI)
             // R3 value <- R3 value + 1
-            file[3] <= file[3] + 1; 
+            file[3] <= file[3] + 8'd1; 
         end
     end
     

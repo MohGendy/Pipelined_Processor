@@ -42,8 +42,6 @@ end
 always @(posedge clk or negedge reset) begin
     if (!reset || intr)
         pc_was_loaded <= 1'b1;
-    else if (pc_en && pc_load)
-        pc_was_loaded <= 1'b1;
     else
         pc_was_loaded <= 1'b0;
 end
@@ -96,20 +94,50 @@ always @(*) begin
     end
     // ===== FETCH =====
     S_FETCH1: begin
-        // Only increment PC if it wasn't just loaded
-        if (!pc_was_loaded) begin
+        // ----- Conditional Branches & LOOP -----
+        if (branch_taken) begin //!
+            pc_load = 1;
             pc_en = 1;
-        end
-        addr_src = 2'b00; // normal fetch
-
-        if (two_byte)
-            next_state = S_FETCH2;
-        else if (branch_taken || (opcode == 4'd11 && brx < 2)) // Loop taken or JZ , JC , JV , JN taken or JMP/CALL
-            next_state = S_BRANCH;
-        else if (opcode == 4'd11 && brx >= 2) // RET/RTI
-            next_state = S_WAIT;
-        else
+            pc_src  = 2'b00; // R[rb]ex
             next_state = S_FETCH1;
+        end
+        // ----- RET / RTI -----
+        else if (opcode == 4'd11 && brx >= 2) begin //!
+            pc_load = 1;
+            pc_en = 1;
+            pc_src  = 2'b11; // data_out
+            next_state = S_FETCH1;
+        end
+        // ----- JMP / CALL -----
+        else if (opcode == 4'd11 && brx < 2) begin 
+            if(bypass_decode_done) begin
+                pc_load = 1;
+                pc_en = 1;
+                pc_src  = 2'b10; // R[rb]d
+                next_state = S_FETCH1;
+            end
+            else begin // bypass not done, stall
+                stall = 1'b1;
+                next_state = S_FETCH1;
+            end
+        end else begin
+            // Only increment PC if it wasn't just loaded
+
+            if (!pc_was_loaded) begin
+                pc_en = 1;
+            end
+            addr_src = 2'b00; // normal fetch
+
+            if (two_byte)
+                next_state = S_FETCH2;
+            else if (branch_taken || (opcode == 4'd11 && brx < 2)) // Loop taken or JZ , JC , JV , JN taken or JMP/CALL
+                next_state = S_FETCH1;
+            else if (opcode == 4'd11 && brx >= 2) // RET/RTI
+                next_state = S_WAIT;
+            else
+                next_state = S_FETCH1;
+            
+        end
     end
 
     // ===== FETCH IMM / EA =====
@@ -123,45 +151,13 @@ always @(*) begin
         stall = 1'b1;
         if (counter == 2'b10) begin
             stall      = 1'b0;
-            next_state = S_BRANCH;
+            next_state = S_FETCH1;
         end
         else begin
             next_state = S_WAIT;
         end
 
     end
-
-    // ===== PC DECISION =====
-    S_BRANCH: begin
-        // ----- Conditional Branches & LOOP -----
-            if (branch_taken) begin
-                pc_load = 1;
-                pc_en = 1;
-                pc_src  = 2'b00; // R[rb]ex
-                next_state = S_FETCH1;
-            end
-        // ----- RET / RTI -----
-        else if (opcode == 4'd11 && brx >= 2) begin
-            pc_load = 1;
-            pc_en = 1;
-            pc_src  = 2'b11; // data_out
-            next_state = S_FETCH1;
-        end
-        // ----- JMP / CALL -----
-        else if (opcode == 4'd11 && brx < 2) begin
-            if(bypass_decode_done) begin
-                pc_load = 1;
-                pc_en = 1;
-                pc_src  = 2'b10; // R[rb]d
-                next_state = S_FETCH1;
-            end
-            else begin // bypass not done, stall
-                stall = 1'b1;
-                next_state = S_BRANCH;
-            end
-        end
-    end
-
     default: begin
         pc_en      = 0;
         pc_load    = 0;

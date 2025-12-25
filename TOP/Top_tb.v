@@ -68,7 +68,7 @@ module Top_tb;
         uut.regFile.file[0] = 8'hFF;
         uut.regFile.file[1] = 8'h02;
         uut.regFile.file[2] = 8'h05;
-        uut.regFile.file[3] = 8'hFF;
+        uut.regFile.file[3] = 8'h7f;
     end
     endtask
 
@@ -349,14 +349,18 @@ endtask
         load_instruction_memory(8'd31,8'h00); //NOP
         load_instruction_memory(8'd32,8'h68); //SETC
         load_instruction_memory(8'd33,8'h98); //JC R0 
-        load_instruction_memory(8'd40,8'h00);  //NOP
-        load_instruction_memory(8'd41,8'h00);  //NOP
-        load_instruction_memory(8'd42,8'h00);  //NOP
-        load_instruction_memory(8'd43,8'h00);  //NOP
-        load_instruction_memory(8'd44,8'h26); //ADD R1,R2
-        load_instruction_memory(8'd45,8'h9D);  //JV R1
-        load_instruction_memory(8'd80,8'h00);  //NOP
-        load_instruction_memory(8'd81,8'h96);  //JN R2  
+        load_instruction_memory(8'h40,8'h00);  //NOP
+        load_instruction_memory(8'h41,8'h00);  //NOP
+        load_instruction_memory(8'h42,8'h00);  //NOP
+        load_instruction_memory(8'h43,8'h00);  //NOP
+        load_instruction_memory(8'h44,8'h26); //ADD R1,R2
+        load_instruction_memory(8'h45,8'h9D);  //JV R1
+        load_instruction_memory(8'h80,8'h00);  //NOP
+        load_instruction_memory(8'h81,8'h94);  //JN R0  
+        load_instruction_memory(8'h36,8'h70);  //push R0
+        load_instruction_memory(8'h37,8'h00);  //NOP
+        load_instruction_memory(8'h38,8'h00);  //NOP
+        load_instruction_memory(8'h39,8'h70);  //push R0
 
 
 
@@ -511,14 +515,15 @@ endtask
         //==================================================================
         //TEST JZ
         $display("\n--- TEST 21: JZ ---");
-        check_PC(8'h32, "JZ to R1 (Should NOT jump as Z=0)");
+        check_PC(8'd32, "JZ to R1 (Should NOT jump as Z=0)");
 
         // SETC
         // To set C flag for JC test
         //TEST JC
-        wait_cycles(3);
+        wait_cycles(4);
         check_PC(8'h40, "JC to R0 (Should jump as C=1)");
 
+        uut.regFile.file[0] = 8'h32;
         uut.regFile.file[1] = 8'h7F;
         uut.regFile.file[2] = 8'h01;
         wait_cycles(4); //NOPs
@@ -529,6 +534,7 @@ endtask
         $display("\n--- TEST 22: JV ---");
         wait_cycles(4);
         check_PC(8'h80, "JV to R1 (Should jump as V=1)");
+        wait_cycles(13);
 
 
 

@@ -287,7 +287,7 @@ add wave -noupdate -expand -group Fetch -radix Instr_radix /Top_tb/uut/I_data
 add wave -noupdate -expand -group Fetch -radix hexadecimal /Top_tb/uut/pc_in
 add wave -noupdate -expand -group Fetch /Top_tb/uut/pc_load
 add wave -noupdate -expand -group Fetch /Top_tb/uut/pc_en
-add wave -noupdate -expand -group Fetch -radix hexadecimal /Top_tb/uut/PC
+add wave -noupdate -expand -group Fetch -radix unsigned /Top_tb/uut/PC
 add wave -noupdate -expand -group Fetch /Top_tb/uut/addr_src
 add wave -noupdate -expand -group Fetch -radix hexadecimal /Top_tb/uut/I_addr
 add wave -noupdate -expand -group Fetch /Top_tb/uut/sf1
