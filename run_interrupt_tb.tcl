@@ -3,6 +3,6 @@ vlog -f sourcefile.txt
 vsim -voptargs=+accs work.interrupt_tb
 
 # add wave form formating
-do wave.tcl
+do wave_int.tcl
 
 run -all
