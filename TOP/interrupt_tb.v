@@ -27,8 +27,8 @@ module interrupt_tb;
     
     // VCD dump for waveform viewing
     initial begin
-        $dumpfile("Top_tb.vcd");
-        $dumpvars(0, Top_tb);
+        $dumpfile("interrupt_tb.vcd");
+        $dumpvars(0, interrupt_tb);
     end
     
     // Instantiate the processor
