@@ -88,7 +88,7 @@ module hazard_forwarding_unit (
             end
         end
         // Priority 2: Check Dependency with Write-Back Stage
-        else if (we_wb && (dest_wb == ra_ex)) begin
+        else if (we_wb && has_hazard[1] && (dest_wb == ra_ex)) begin
             // We have a match in the Write-Back Stage
             
             // Check SW2 to see source of data (Memory/ALU or Input Port)
@@ -119,7 +119,7 @@ module hazard_forwarding_unit (
             end
         end
         // Priority 2: Check Dependency with Write-Back Stage
-        else if (we_wb && (dest_wb == rb_ex)) begin
+        else if (we_wb && has_hazard[0] && (dest_wb == rb_ex)) begin
             if (sw2_wb == 1'b1) begin
                 // Input Port Data -> Forward Code 3
                 forward_b = 2'b11;

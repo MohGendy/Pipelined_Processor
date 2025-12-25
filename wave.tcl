@@ -332,6 +332,7 @@ add wave -noupdate -expand -group Decode /Top_tb/uut/SE2
 add wave -noupdate -expand -group Decode /Top_tb/uut/SE3
 add wave -noupdate -expand -group Decode /Top_tb/uut/stall_d
 add wave -noupdate -expand -group Decode /Top_tb/uut/SHD
+add wave -noupdate -expand -group Decode /Top_tb/uut/has_hazard
 add wave -noupdate -divider {D to Ex latch}
 add wave -noupdate -expand -group D_EX_latch /Top_tb/uut/ld_D_Ex
 add wave -noupdate -expand -group D_EX_latch /Top_tb/uut/flush_D_Ex
@@ -367,6 +368,7 @@ add wave -noupdate -expand -group Excute /Top_tb/uut/Overflow
 add wave -noupdate -expand -group Excute -radix hexadecimal /Top_tb/uut/Res_EX
 add wave -noupdate -expand -group Excute /Top_tb/uut/CCR_out
 add wave -noupdate -expand -group Excute /Top_tb/uut/flush
+add wave -noupdate -expand -group Excute /Top_tb/uut/has_hazard_Ex
 add wave -noupdate -divider {EX to M Latch}
 add wave -noupdate -expand -group EX_M_latch /Top_tb/uut/ld_Ex_M
 add wave -noupdate -expand -group EX_M_latch /Top_tb/uut/flush_Ex_M
