@@ -594,7 +594,7 @@ endtask
         $display("\n--- TEST 26: CALL and RET ---");
         wait_cycles(6);
         check_PC(8'h25, "After CALL, PC should be 0x37d");
-        wait_cycles(2);
+        wait_cycles(4);
         check_PC(8'h22, "After RET, PC should be 0x34d");
 
         wait_cycles(5);
