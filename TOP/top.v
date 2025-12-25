@@ -100,6 +100,8 @@ module top (
 
     wire [1:0] SHD;
     wire [1:0] has_hazard_Ex;
+
+    wire flush_next ;
     
     
 //? Excute 
@@ -190,10 +192,10 @@ module top (
         assign flush_Ex_M = stall ; //stall from hazard unit
 
         assign ld_D_Ex    = !stall ; //stall from hazard unit 
-        assign flush_D_Ex = (!stall) & (flush || stall_d) ;
+        assign flush_D_Ex = (!stall) & (flush || stall_d || flush_next) ;
 
-        assign ld_IR      = (!stall) & (! stall_d) ;
-        assign flush_IR   = (!stall ) & (flush || stall_CU || ~SD2)   ; //* SD2 added to flush on immediate
+        assign ld_IR      = (!stall) & (! stall_d) & (!stall_CU);
+        assign flush_IR   = (!stall ) & (flush || ~SD2)   ; //* SD2 added to flush on immediate
 
         assign bypass_decode_done = ~stall_d ; 
         assign PC_en_assigned = pc_en & ~stall & ~stall_d;
@@ -329,7 +331,8 @@ module top (
         .addr_src           (addr_src           ), 
         .int_clr            (int_clr            ),
         .Int_en             (Int_en             ),
-        .has_hazard         (has_hazard         )
+        .has_hazard         (has_hazard         ),
+        .flush_next         (flush_next         )
     );
 
     D_Ex_Latch u_D_Ex_Latch(

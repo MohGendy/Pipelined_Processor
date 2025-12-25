@@ -56,7 +56,9 @@ module Control_Unit (
 
     output reg         Int_en,
 
-    output wire [1:0] has_hazard
+    output wire [1:0] has_hazard ,
+    output wire        flush_next
+
 );
 
 //wires 
@@ -145,7 +147,8 @@ assign ra = IR[3:2] ; //or brx
         .sf1(sf1), 
         .pc_src(pc_src),
         .addr_src(addr_src),
-        .int_clr(int_clr) 
+        .int_clr(int_clr) ,
+        .flush_next(flush_next)
     );
     hazard_CU u_hazard_CU(
         .opcode     (op_code     ),

@@ -279,6 +279,10 @@ add wave -noupdate -expand -group TB /interrupt_tb/total_tests
 add wave -noupdate -divider CU
 add wave -noupdate -expand -group CU -radix PC_FSM_radix /interrupt_tb/uut/u_Control_Unit/PC_CU/state
 add wave -noupdate -expand -group CU -radix PC_FSM_radix /interrupt_tb/uut/u_Control_Unit/PC_CU/next_state
+
+add wave -noupdate -expand -group CU -radix unsigned /interrupt_tb/uut/u_Control_Unit/PC_CU/next_counter
+add wave -noupdate -expand -group CU -radix unsigned /interrupt_tb/uut/u_Control_Unit/PC_CU/counter
+
 add wave -noupdate -divider Fetch
 add wave -noupdate -expand -group Fetch /interrupt_tb/uut/pc_src
 add wave -noupdate -expand -group Fetch -radix hexadecimal /interrupt_tb/uut/reg_rb_d
