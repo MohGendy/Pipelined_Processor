@@ -535,14 +535,67 @@ endtask
         wait_cycles(4);
         check_PC(8'h80, "JV to R1 (Should jump as V=1)");
         wait_cycles(13);
+        //===================================================================
+        clear_memory();
+        load_instruction_memory(8'd0,8'd2);
+        load_instruction_memory(8'd1,8'd110);
+        load_instruction_memory(8'd2,8'hC0);  //LDM R0, #0x03
+        load_instruction_memory(8'd3,8'h03);  //IMMEDIATE VALUE
+        load_instruction_memory(8'd4,8'hC1);  //LDM R1, #0x01
+        load_instruction_memory(8'd5,8'h01);  //IMMEDIATE VALUE
+        load_instruction_memory(8'd6,8'hC2);  //LDM R2, #0x0F
+        load_instruction_memory(8'd7,8'h0F);  //IMMEDIATE VALUE
+        load_instruction_memory(8'd8,8'hC3);  //LDM R3, #0xFF
+        load_instruction_memory(8'd9,8'hFF);  //IMMEDIATE VALUE
+        load_instruction_memory(8'd10,8'h34);  //SUB R1,R0
+        load_instruction_memory(8'd11,8'h96);  //JN R2
 
+        load_instruction_memory(8'd15,8'hC1); //LDM R1, #0x00
+        load_instruction_memory(8'd16,8'h00); //IMMEDIATE VALUE
+        load_instruction_memory(8'd17,8'hC2); //LDM R2, #0x13
+        load_instruction_memory(8'd18,8'h13); //IMMEDIATE VALUE
+        load_instruction_memory(8'd19,8'hA2); //LOOP R0, R2
 
+        load_instruction_memory(8'd25,8'hC2); //LDM R2, #0x1F
+        load_instruction_memory(8'd26,8'h1F); //IMM
 
+        load_instruction_memory(8'd27,8'hB2); //JMP R2 
 
+        load_instruction_memory(8'd31,8'hC2); //LDM R2, #0x25
+        load_instruction_memory(8'd32,8'h25); //IMM
+        load_instruction_memory(8'd33,8'hB6); //CALL R2
 
+        load_instruction_memory(8'd37,8'h89); //INC R1
+        load_instruction_memory(8'd38,8'hB8); //RET
 
+        apply_reset(3);
 
+        // TEST : Reset
+        $display("--- TEST : RESET ---");
+        check_PC(8'h02, "Reset loads PC from M[0]");
+        
 
+        // TEST : JN
+        $display("\n--- TEST 23: JN ---");
+        wait_cycles(12);
+        check_PC(8'h15, "JN to R2 (Should jump as N=1)");
+
+        // TEST : LOOP
+        $display("\n--- TEST 24: LOOP ---");
+        wait_cycles(13);
+        check_PC(8'h16, "LOOP EXIT PC = 22d");
+
+        // TEST : JMP
+        $display("\n--- TEST 25: JMP ---");
+        wait_cycles(9);
+        check_PC(8'h1F, "JMP to R2");
+
+        // TEST : CALL and RET
+        $display("\n--- TEST 26: CALL and RET ---");
+        wait_cycles(6);
+        check_PC(8'h25, "After CALL, PC should be 0x37d");
+        wait_cycles(2);
+        check_PC(8'h22, "After RET, PC should be 0x34d");
 
 
         wait_cycles(5);
