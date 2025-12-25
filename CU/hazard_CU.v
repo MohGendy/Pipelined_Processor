@@ -1,9 +1,13 @@
 module hazard_CU (
     input wire [3:0] opcode,
     input wire [1:0] ra,
+    input wire sf1,
     output reg [1:0] has_hazard //1=> a , 0=> b
 );
     always @(*) begin 
+        if (sf1) begin
+            has_hazard = 2'b10;
+        end
         casex ( {opcode,ra} )
                             
             6'b0001xx,
