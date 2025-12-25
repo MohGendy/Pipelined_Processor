@@ -54,7 +54,9 @@ module Control_Unit (
     output wire [1:0]   addr_src,
     output wire         int_clr,
 
-    output reg         Int_en  
+    output reg         Int_en,
+
+    output wire [1:0] has_hazard
 );
 
 //wires 
@@ -145,7 +147,12 @@ assign ra = IR[3:2] ; //or brx
         .addr_src(addr_src),
         .int_clr(int_clr) 
     );
-
+    hazard_CU u_hazard_CU(
+        .opcode     (op_code     ),
+        .ra         (ra         ),
+        .has_hazard (has_hazard )
+    );
+    
     always @(posedge clk or negedge rst) begin
         if(!rst) Int_en = 1'b0;
         else if (sf1) Int_en = 1'b1; //interrupt

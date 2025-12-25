@@ -18,7 +18,7 @@ always @(posedge clk or negedge rst) begin
         Data_base_reg <= 8'd128 ;
     end
     if(WEn) begin
-        Mem[D_addr] <= Wdata ;
+        Mem[D_addr + Data_base_reg] <= Wdata ;
     end
 end
 

@@ -331,10 +331,11 @@ endtask
         load_instruction_memory(8'd14,8'h6C); //CLRC 1100
         load_instruction_memory(8'd15,8'h78); //OUT R0 1000
         load_instruction_memory(8'd16,8'h7D); //IN R1 1101
-        load_instruction_memory(8'd17,8'h82); //NOT R2  0010
+        load_instruction_memory(8'd17,8'h81); //NOT R1  0010
         load_instruction_memory(8'd18,8'h84); //NEG R0  0100
         load_instruction_memory(8'd19,8'h89); //INC R1  1001
         load_instruction_memory(8'd20,8'h8E); //DEC R2  1110
+        
         load_instruction_memory(8'd21,8'hC1); //LDM R1, #0x0F
         load_instruction_memory(8'd22,8'h0F); //IMMEDIATE VALUE 
         load_instruction_memory(8'd23,8'hC6); //LDD R2, #0x0B
@@ -359,8 +360,8 @@ endtask
 
 
 
-        load_instruction_memory(8'd139,8'h50); //DATA MEM[0B] = 50h
-        load_instruction_memory(8'd178,8'h40); //DATA MEM[50] = 40h
+        load_instruction_memory(8'h8B ,8'h50); //DATA MEM[0B] = 50h
+        load_instruction_memory(8'hD0 ,8'h40); //DATA MEM[50] = 40h
 
 
         initialize_test();
@@ -458,8 +459,8 @@ endtask
 
         // TEST NOT
         $display("\n--- TEST 12: NOT ---");
-        wait_cycles(1);
-        check_register(2'b10, 8'h7C, "NOT R2 ( ~(10000011) = 01111100 )");
+        wait_cycles(2);
+        check_register(2'b01, 8'h32, "NOT R1 ( ~(11001101) = 00110010 )");
 
         // TEST NEG
         $display("\n--- TEST 13: NEG ---");
@@ -469,12 +470,12 @@ endtask
         //TEST INC 
         $display("\n--- TEST 14: INC ---");
         wait_cycles(1);
-        check_register(2'b01, 8'hCE, "INC R1 (CD+1=CE)");
+        check_register(2'b01, 8'h33, "INC R1 (32+1=33)");
 
         //TEST DEC
         $display("\n--- TEST 15: DEC ---");
         wait_cycles(1);
-        check_register(2'b10, 8'h7B, "DEC R2 (7C-1=7B)");
+        check_register(2'b10, 8'h82, "DEC R2 (83-1=82)");
 
         //==================================================================
         // L-FORMAT TEST CASES
@@ -493,7 +494,7 @@ endtask
         //TEST STD M[12] = R0 = AB
         $display("\n--- TEST 18: STD ---");
         wait_cycles(2);
-        check_memory(8'h0C, 8'hAB, "STD MEM[0C], R0 (DATA_MEM[0C]=AB)"); 
+        check_memory(8'h8C, 8'hAB, "STD MEM[0C], R0 (DATA_MEM[0C]=AB)"); 
 
         //TEST LDI  R(rb)= M[R(ra)]     ra=2  rb=0 ->   R2=50  R0= M[50] = 40
         $display("\n--- TEST 19: LDI ---");
@@ -503,7 +504,7 @@ endtask
         //TEST STI  M[R(ra)] = R(rb)   ra=1  rb=2 -> R1=60  R2=50  MEM[60]=50
         $display("\n--- TEST 20: STI ---");
         wait_cycles(1);
-        check_memory(8'h60, 8'h50, "STI MEM[60], R1 (MEM[60]=50)");
+        check_memory(8'h8F, 8'h50, "STI MEM[60], R2 (MEM[60]=50)");
         
         //==================================================================
         // B-FORMAT TEST CASES

@@ -17,6 +17,7 @@
 */
 
 module hazard_forwarding_unit (
+    input [1:0] has_hazard,
     // Inputs from Current Stage (ID/EX) - The instruction needing data
     input [1:0] ra_ex,          // Address of Source Register A
     input [1:0] rb_ex,          // Address of Source Register B
@@ -69,7 +70,7 @@ module hazard_forwarding_unit (
         // 3. Hazard & Forwarding Logic for RA (Source A)
         
         // Priority 1: Check Dependency with Memory Stage (Most recent instruction)
-        if (we_mem && (dest_mem == ra_ex)) begin
+        if (we_mem && has_hazard[1] && (dest_mem == ra_ex)) begin
             // We have a match in the Memory Stage
             
             // Check SM2 to see if it is a Load operation or just ALU pass-through
@@ -107,7 +108,7 @@ module hazard_forwarding_unit (
         // (Same logic as above, but comparing with rb_ex)
 
         // Priority 1: Check Dependency with Memory Stage
-        if (we_mem && (dest_mem == rb_ex)) begin
+        if (we_mem && has_hazard[0] && (dest_mem == rb_ex)) begin
             if (sm2_mem | sw2_mem ) begin
                 // Load-Use Hazard -> Stall
                 stall = 1'b1;

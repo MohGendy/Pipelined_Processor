@@ -22,6 +22,7 @@ module D_Ex_Latch (
     input [1:0]in_SE3,
     //6
     input in_Hlt,
+    input [1:0] in_has_hazard,
 
     input clk,
     input reset,
@@ -49,6 +50,7 @@ module D_Ex_Latch (
     output reg [2:0]BU,
     output reg SE2,
     output reg [1:0]SE3,
+    output reg [1:0]has_hazard,
     // 6
     output reg Hlt
 
@@ -80,6 +82,7 @@ module D_Ex_Latch (
             SE3 <= 2'b0;
             // 6
             Hlt <= 1'b0;
+            has_hazard <= 2'b00;
             
         end 
         else begin
@@ -107,6 +110,8 @@ module D_Ex_Latch (
                 SE3 <= in_SE3;
                 // 6
                 Hlt <= in_Hlt;
+                has_hazard <= in_has_hazard;
+
             end            
         end
     end
