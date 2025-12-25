@@ -192,10 +192,10 @@ module top (
         assign flush_Ex_M = stall ; //stall from hazard unit
 
         assign ld_D_Ex    = !stall ; //stall from hazard unit 
-        assign flush_D_Ex = (!stall) & (flush || stall_d || flush_next) ;
+        assign flush_D_Ex = (!stall) & (flush | stall_d | flush_next) ;
 
         assign ld_IR      = (!stall) & (! stall_d) & (!stall_CU);
-        assign flush_IR   = (!stall ) & (flush || ~SD2)   ; //* SD2 added to flush on immediate
+        assign flush_IR   = (!stall ) & (flush | ~SD2)   ; //* SD2 added to flush on immediate
 
         assign bypass_decode_done = ~stall_d ; 
         assign PC_en_assigned = pc_en & ~stall & ~stall_d;
