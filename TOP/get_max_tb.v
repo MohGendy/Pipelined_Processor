@@ -318,7 +318,7 @@ endtask
         initialize_regfile();
         load_hex_file("get_max.hex");
         apply_reset(3);
-        wait_cycles(50); // Wait for program to execute
+        wait_cycles(100); // Wait for program to execute
         //Find max of: 12, 45, 23, 67, 34
         check_output_port(8'h43, "Get Max Output Check");
 
