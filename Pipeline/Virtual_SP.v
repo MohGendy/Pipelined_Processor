@@ -51,7 +51,7 @@ module SP_Unit (
     assign target_Wb = sw1_Wb? rb_Wb : ra_Wb; 
 
     assign Not_Ready = Invalid;
-    assign Bypassed_SP = sel?data_to_CPU:BypassOut;
+    assign Bypassed_SP = sel?data_to_CPU:virtual_SP;
 
     always @(posedge clk or negedge rst) begin //? manage sync opertation
         if(!rst) begin
@@ -68,6 +68,7 @@ module SP_Unit (
     always @(*) begin //? manage async opertation
         sel = 1'b0;
         Invalid = 1'b0;
+        BypassOut = virtual_SP;
         if (!rst)
             BypassOut = SP;
         else if (we_Ex & (&target_Ex)) begin //* bitwise and => target = 11 
@@ -109,7 +110,6 @@ module SP_Unit (
                 BypassOut = virtual_SP;
                 Invalid = 1'b0;
             end
-
         end
 
     end
