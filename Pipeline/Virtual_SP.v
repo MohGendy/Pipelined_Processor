@@ -51,11 +51,11 @@ module SP_Unit (
     assign target_Wb = sw1_Wb? rb_Wb : ra_Wb; 
 
     assign Not_Ready = Invalid;
-    assign Bypassed_SP = sel?data_to_CPU:BypassOut;
+    assign Bypassed_SP = sel? data_to_CPU : virtual_SP;
 
     always @(posedge clk or negedge rst) begin //? manage sync opertation
         if(!rst) begin
-            virtual_SP <= SP;
+            virtual_SP <= SP;  //set virtual sp with R3
         end
         else if (!stall) begin
             if (SP_Ex[1] &! Invalid) virtual_SP <= BypassOut + 8'd1;
@@ -65,13 +65,12 @@ module SP_Unit (
 
     end
 
-    always @(*) begin //? manage async opertation
-        sel = 1'b0;
-        Invalid = 1'b0;
-        if (!rst)
-            BypassOut = SP;
-        else if (we_Ex & (&target_Ex)) begin //* bitwise and => target = 11 
-            BypassOut = virtual_SP; //!default
+ always @(*) begin //? manage async opertation
+        sel = 1'b0 ;              //default out virtual SP
+        Invalid = 1'b0 ;         //default valid  
+        BypassOut = virtual_SP ;//default dont change virtual sp
+
+        if (we_Ex & (&target_Ex)) begin //* bitwise and => target = 11 
             if ((~sw2_Ex) & (~sm2_Ex)) begin
                 BypassOut = ALU_res;
                 Invalid = 1'b0;
@@ -80,10 +79,9 @@ module SP_Unit (
                 BypassOut = virtual_SP;
                 Invalid = 1'b1;
             end
-
         end
         else if (we_M & (&target_M)) begin //* bitwise and => target = 11 
-            BypassOut = virtual_SP; //!default
+            
             if ((~sw2_M) & (sm2_M)) begin
                 BypassOut = D_data;
                 Invalid = 1'b1;
@@ -99,7 +97,7 @@ module SP_Unit (
 
         end
         else if (we_Wb & (&target_Wb)) begin //* bitwise and => target = 11 
-            BypassOut = virtual_SP; //!default
+            
             if ((sw2_Wb)) begin
                 BypassOut = data_to_CPU;
                 Invalid = 1'b0;
@@ -113,5 +111,6 @@ module SP_Unit (
         end
 
     end
+
     
 endmodule
