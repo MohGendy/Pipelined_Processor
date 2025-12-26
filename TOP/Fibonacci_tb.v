@@ -318,8 +318,8 @@ endtask
         initialize_regfile();
         load_hex_file("fib.hex");
         apply_reset(3);
-        wait_cycles(100); // Wait for program to execute
-        // wait(HLT_Flag);
+        // wait_cycles(100); // Wait for program to execute
+        wait(HLT_Flag);
         
         check_memory(8'hFF , 8'h00, "Fibonacci Result at MEM[0xFF]=0x00 for Fib(0)");
         check_memory(8'hFE , 8'h01, "Fibonacci Result at MEM[0xFE]=0x01 for Fib(1)");

@@ -111,7 +111,6 @@ module SP_Unit (
                 BypassOut = virtual_SP;
                 Invalid = 1'b0;
             end
-
         end
 
     end
