@@ -18,6 +18,7 @@
 
 module hazard_forwarding_unit (
     input [1:0] has_hazard,
+    input       SP_Invalid,
     // Inputs from Current Stage (ID/EX) - The instruction needing data
     input [1:0] ra_ex,          // Address of Source Register A
     input [1:0] rb_ex,          // Address of Source Register B
@@ -67,8 +68,11 @@ module hazard_forwarding_unit (
         forward_a = 2'b00; // No forwarding by default (Source 0)
         forward_b = 2'b00; // No forwarding by default (Source 0)
 
+        if ((has_hazard[1] & (&ra_ex) & SP_Invalid) | (has_hazard[0] & (&rb_ex) & SP_Invalid)) begin
+            stall = 1'b1;
+        end
+
         // 3. Hazard & Forwarding Logic for RA (Source A)
-        
         // Priority 1: Check Dependency with Memory Stage (Most recent instruction)
         if (we_mem && has_hazard[1] && (dest_mem == ra_ex)) begin
             // We have a match in the Memory Stage

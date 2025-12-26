@@ -107,9 +107,11 @@ module top (
 //? Excute 
 
     wire [1:0] SHA;
+    wire [7:0] MHA_out;
     wire [7:0] RD_A_Ex;
 
     wire [1:0] SHB;
+    wire [7:0] MHB_out;
     wire [7:0] RD_B_Ex;
 
 
@@ -176,6 +178,9 @@ module top (
     wire intr_in ;
 
     wire HLT_out ;
+
+    wire SP_Invalid;
+    wire [7:0] Bypassed_SP;
 //! assigns
 
     assign RB_addr  = IR[1:0];
@@ -296,7 +301,7 @@ module top (
 //! CU
 
     Control_Unit u_Control_Unit(
-        .clk                (clk &! Hlt_en_Ex      ),
+        .clk                (clk &! Hlt_en_Ex   ),
         .rst                (rst                ),
         .IR                 (IR                 ),
         .reg_sf1            (reg_sf1            ),
@@ -417,8 +422,16 @@ module top (
         .in1 (res_M       ),
         .in2 (DataOut_Wb  ),
         .in3 (data_to_cpu ), 
+        .out (MHA_out     )
+    );
+
+    mux_2to1 MSPA(
+        .sel ((&ra_Ex)    ),
+        .in0 (MHA_out     ),
+        .in1 (Bypassed_SP ),
         .out (RD_A_Ex     )
     );
+    
 
     mux_4to1 MHB(//:)
         .sel (SHB         ),
@@ -426,9 +439,16 @@ module top (
         .in1 (res_M       ),
         .in2 (DataOut_Wb  ),
         .in3 (data_to_cpu ), 
-        .out (RD_B_Ex     )
+        .out (MHB_out     )
     );
 
+    mux_2to1 MSPB(
+        .sel ((&rb_Ex)    ),
+        .in0 (MHB_out     ),
+        .in1 (Bypassed_SP ),
+        .out (RD_B_Ex     )
+    );
+    
 
     mux_2to1 ME2(//:)
         .sel (SE2_Ex  ),
@@ -511,6 +531,7 @@ module top (
     );
 
     hazard_forwarding_unit u_hazard_forwarding_unit( //:)
+        .SP_Invalid(SP_Invalid),
         .ra_ex     (ra_Ex     ),
         .rb_ex     (rb_Ex     ),
         .we_mem    (RW_M      ),
@@ -529,6 +550,40 @@ module top (
         .forward_b (SHB       ),
         .has_hazard(has_hazard_Ex)
     );
+
+    SP_Unit virtual_SP(
+        .clk         (clk         ),
+        .rst         (rst         ),
+        .stall       (stall       ),
+        .SP          (in_RD_A_D   ),
+        .ALU_res     (Res_EX      ),
+        .D_data      (D_data      ),
+        .data_to_CPU (data_to_cpu ),
+
+        .SP_Ex       (SP_Ex       ),
+        .we_Ex       (RW_Ex       ),
+        .sw1_Ex      (SW1_Ex      ),
+        .ra_Ex       (ra_Ex       ),
+        .rb_Ex       (rb_Ex       ),
+        .sm2_Ex      (SM2_Ex      ),
+        .sw2_Ex      (SW2_Ex      ),
+
+        .we_M        (RW_M        ),
+        .sw1_M       (SW1_M       ),
+        .ra_M        (ra_M        ),
+        .rb_M        (rb_M        ),
+        .sm2_M       (SM2_M       ),
+        .sw2_M       (SW2_M       ),
+
+        .we_Wb       (RW_Wb       ),
+        .sw1_Wb      (SW1_Wb      ),
+        .ra_Wb       (ra_Wb       ),
+        .rb_Wb       (rb_Wb       ),
+        .sw2_Wb      (SW2_Wb      ),
+        .Bypassed_SP (Bypassed_SP ),
+        .Not_Ready   (SP_Invalid  )
+    );
+    
 
 //? Memory
 

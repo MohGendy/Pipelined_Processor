@@ -18,6 +18,7 @@ module RegFile_ControlUnit (
 );
 
     // Opcodes Constants
+    localparam OP_NOP     = 4'd0;  // NOP
     localparam OP_PUSH_POP= 4'd7;  // PUSH / POP instructions
     localparam OP_CALL    = 4'd11; // CALL / JMP / RET / RTI instructions
     localparam OP_LD_ST_I = 4'd12; // LDM, LDD, STD instructions
@@ -47,7 +48,12 @@ module RegFile_ControlUnit (
         end
         else begin
             case (Opcode)
-                
+                // NOP (OPcode 0)
+                OP_NOP: begin
+                    SD1 = 1'b1;
+                    SD2 = 1'b1; 
+                    SD3 = 1'b0; 
+                end
                 // PUSH/POP Instructions (Opcode 7)
                 OP_PUSH_POP: begin
                     SD2 = 1'b1; 

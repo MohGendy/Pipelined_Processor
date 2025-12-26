@@ -336,7 +336,15 @@ add wave -noupdate -expand -group Decode /FIb_tb/uut/has_hazard
 add wave -noupdate -divider {D to Ex latch}
 add wave -noupdate -expand -group D_EX_latch /FIb_tb/uut/ld_D_Ex
 add wave -noupdate -expand -group D_EX_latch /FIb_tb/uut/flush_D_Ex
+add wave -noupdate -divider {Virtual SP}
+add wave -noupdate -expand -group {Virtual SP} -radix hexadecimal /FIb_tb/uut/virtual_SP/virtual_SP
+add wave -noupdate -expand -group {Virtual SP} -radix hexadecimal /FIb_tb/uut/virtual_SP/SP
+add wave -noupdate -expand -group {Virtual SP} -radix hexadecimal /FIb_tb/uut/virtual_SP/BypassOut
 add wave -noupdate -divider Excute
+add wave -noupdate -expand -group Excute -radix hexadecimal /FIb_tb/uut/MHB_out
+add wave -noupdate -expand -group Excute -radix hexadecimal /FIb_tb/uut/MHA_out
+add wave -noupdate -expand -group Excute -radix hexadecimal /FIb_tb/uut/Bypassed_SP
+add wave -noupdate -expand -group Excute /FIb_tb/uut/SP_Invalid
 add wave -noupdate -expand -group Excute /FIb_tb/uut/stall
 add wave -noupdate -expand -group Excute /FIb_tb/uut/ra_Ex
 add wave -noupdate -expand -group Excute /FIb_tb/uut/rb_Ex
