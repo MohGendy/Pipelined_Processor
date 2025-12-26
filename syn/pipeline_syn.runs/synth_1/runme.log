@@ -1,0 +1,623 @@
+
+*** Running vivado
+    with args -log top.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source top.tcl
+
+
+****** Vivado v2019.1 (64-bit)
+  **** SW Build 2552052 on Fri May 24 14:49:42 MDT 2019
+  **** IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source top.tcl -notrace
+Command: synth_design -top top -part xc7a35tcpg236-2L
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Device 21-403] Loading part xc7a35tcpg236-2L
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 33680 
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 818.164 ; gain = 172.980
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'top' [D:/y/third_year_proj/MP/repo/syn/TOP/top.v:1]
+INFO: [Synth 8-6157] synthesizing module 'pc_in_mux' [D:/y/third_year_proj/MP/repo/syn/PC/pc_in.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'pc_in_mux' (1#1) [D:/y/third_year_proj/MP/repo/syn/PC/pc_in.v:1]
+INFO: [Synth 8-6157] synthesizing module 'PC' [D:/y/third_year_proj/MP/repo/syn/PC/pc_reg.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'PC' (2#1) [D:/y/third_year_proj/MP/repo/syn/PC/pc_reg.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mem_addr_mux' [D:/y/third_year_proj/MP/repo/syn/PC/mem_addr_mux.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'mem_addr_mux' (3#1) [D:/y/third_year_proj/MP/repo/syn/PC/mem_addr_mux.v:1]
+INFO: [Synth 8-6157] synthesizing module 'Memory' [D:/y/third_year_proj/MP/repo/syn/Memory/Memory.v:2]
+	Parameter Width bound to: 256 - type: integer 
+	Parameter addr_width bound to: 8 - type: integer 
+	Parameter Depth bound to: 8 - type: integer 
+WARNING: [Synth 8-5788] Register Mem_reg in module Memory is has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code 
+WARNING: [Synth 8-4767] Trying to implement RAM 'Mem_reg' in registers. Block RAM or DRAM implementation is not possible; see log for reasons.
+Reason is one or more of the following :
+	1: RAM is sensitive to asynchronous reset signal. this RTL style is not supported. 
+RAM "Mem_reg" dissolved into registers
+INFO: [Synth 8-6155] done synthesizing module 'Memory' (4#1) [D:/y/third_year_proj/MP/repo/syn/Memory/Memory.v:2]
+INFO: [Synth 8-6157] synthesizing module 'mux_2to1' [D:/y/third_year_proj/MP/repo/syn/PC/2to1_mux.v:1]
+	Parameter size bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mux_2to1' (5#1) [D:/y/third_year_proj/MP/repo/syn/PC/2to1_mux.v:1]
+INFO: [Synth 8-6157] synthesizing module 'instruction_reg' [D:/y/third_year_proj/MP/repo/syn/Instruction_reg/Instruction_reg.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'instruction_reg' (6#1) [D:/y/third_year_proj/MP/repo/syn/Instruction_reg/Instruction_reg.v:1]
+INFO: [Synth 8-6157] synthesizing module 'regfile' [D:/y/third_year_proj/MP/repo/syn/Register_File/RegFile.v:4]
+INFO: [Synth 8-6155] done synthesizing module 'regfile' (7#1) [D:/y/third_year_proj/MP/repo/syn/Register_File/RegFile.v:4]
+INFO: [Synth 8-6157] synthesizing module 'mux_2to1__parameterized0' [D:/y/third_year_proj/MP/repo/syn/PC/2to1_mux.v:1]
+	Parameter size bound to: 2 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mux_2to1__parameterized0' (7#1) [D:/y/third_year_proj/MP/repo/syn/PC/2to1_mux.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mux_4to1' [D:/y/third_year_proj/MP/repo/syn/PC/4to1_mux.v:1]
+	Parameter size bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mux_4to1' (8#1) [D:/y/third_year_proj/MP/repo/syn/PC/4to1_mux.v:1]
+INFO: [Synth 8-6157] synthesizing module 'Control_Unit' [D:/y/third_year_proj/MP/repo/syn/CU/CU_TOP.v:1]
+INFO: [Synth 8-6157] synthesizing module 'control_unit_branch_logic' [D:/y/third_year_proj/MP/repo/syn/CU/BranchUnit_CU.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'control_unit_branch_logic' (9#1) [D:/y/third_year_proj/MP/repo/syn/CU/BranchUnit_CU.v:6]
+INFO: [Synth 8-6157] synthesizing module 'CU_ALU' [D:/y/third_year_proj/MP/repo/syn/CU/CU_ALU.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'CU_ALU' (10#1) [D:/y/third_year_proj/MP/repo/syn/CU/CU_ALU.v:1]
+INFO: [Synth 8-6157] synthesizing module 'CU_CCR' [D:/y/third_year_proj/MP/repo/syn/CU/CU_CCR.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'CU_CCR' (11#1) [D:/y/third_year_proj/MP/repo/syn/CU/CU_CCR.v:1]
+INFO: [Synth 8-6157] synthesizing module 'RegFile_ControlUnit' [D:/y/third_year_proj/MP/repo/syn/CU/D_CU.v:5]
+	Parameter OP_NOP bound to: 4'b0000 
+	Parameter OP_PUSH_POP bound to: 4'b0111 
+	Parameter OP_CALL bound to: 4'b1011 
+	Parameter OP_LD_ST_I bound to: 4'b1100 
+	Parameter RA_PUSH bound to: 2'b00 
+	Parameter RA_POP bound to: 2'b01 
+	Parameter BRX_CALL bound to: 2'b01 
+	Parameter BRX_RET bound to: 2'b10 
+	Parameter BRX_RTI bound to: 2'b11 
+INFO: [Synth 8-6155] done synthesizing module 'RegFile_ControlUnit' (12#1) [D:/y/third_year_proj/MP/repo/syn/CU/D_CU.v:5]
+INFO: [Synth 8-6157] synthesizing module 'Memory_Stage_CU' [D:/y/third_year_proj/MP/repo/syn/CU/Mem_CU.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'Memory_Stage_CU' (13#1) [D:/y/third_year_proj/MP/repo/syn/CU/Mem_CU.v:1]
+INFO: [Synth 8-6157] synthesizing module 'Write_Back_Stage_CU' [D:/y/third_year_proj/MP/repo/syn/CU/WB_control.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'Write_Back_Stage_CU' (14#1) [D:/y/third_year_proj/MP/repo/syn/CU/WB_control.v:1]
+INFO: [Synth 8-6157] synthesizing module 'Fetch_Stage_CU' [D:/y/third_year_proj/MP/repo/syn/CU/PC_CU.v:1]
+	Parameter S_RESET_INTER bound to: 3'b000 
+	Parameter S_FETCH1 bound to: 3'b001 
+	Parameter S_FETCH2 bound to: 3'b010 
+	Parameter S_WAIT bound to: 3'b011 
+	Parameter S_BRANCH bound to: 3'b100 
+INFO: [Synth 8-6155] done synthesizing module 'Fetch_Stage_CU' (15#1) [D:/y/third_year_proj/MP/repo/syn/CU/PC_CU.v:1]
+INFO: [Synth 8-6157] synthesizing module 'hazard_CU' [D:/y/third_year_proj/MP/repo/syn/CU/hazard_CU.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'hazard_CU' (16#1) [D:/y/third_year_proj/MP/repo/syn/CU/hazard_CU.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'Control_Unit' (17#1) [D:/y/third_year_proj/MP/repo/syn/CU/CU_TOP.v:1]
+INFO: [Synth 8-6157] synthesizing module 'D_Ex_Latch' [D:/y/third_year_proj/MP/repo/syn/Latches/D_Ex.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'D_Ex_Latch' (18#1) [D:/y/third_year_proj/MP/repo/syn/Latches/D_Ex.v:1]
+INFO: [Synth 8-6157] synthesizing module 'bypass_jmp' [D:/y/third_year_proj/MP/repo/syn/Pipeline/bypass_jmp.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'bypass_jmp' (19#1) [D:/y/third_year_proj/MP/repo/syn/Pipeline/bypass_jmp.v:1]
+INFO: [Synth 8-6157] synthesizing module 'ALU' [D:/y/third_year_proj/MP/repo/syn/ALU/ALU.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'ALU' (20#1) [D:/y/third_year_proj/MP/repo/syn/ALU/ALU.v:1]
+INFO: [Synth 8-6157] synthesizing module 'CCR' [D:/y/third_year_proj/MP/repo/syn/ALU/CCR.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'CCR' (21#1) [D:/y/third_year_proj/MP/repo/syn/ALU/CCR.v:1]
+INFO: [Synth 8-6157] synthesizing module 'branch_unit' [D:/y/third_year_proj/MP/repo/syn/Pipeline/Branch_Unit.v:17]
+INFO: [Synth 8-6155] done synthesizing module 'branch_unit' (22#1) [D:/y/third_year_proj/MP/repo/syn/Pipeline/Branch_Unit.v:17]
+INFO: [Synth 8-6157] synthesizing module 'Ex_M_Latch' [D:/y/third_year_proj/MP/repo/syn/Latches/Ex_M.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'Ex_M_Latch' (23#1) [D:/y/third_year_proj/MP/repo/syn/Latches/Ex_M.v:1]
+INFO: [Synth 8-6157] synthesizing module 'hazard_forwarding_unit' [D:/y/third_year_proj/MP/repo/syn/Pipeline/hazard_forwarding_unit.v:19]
+INFO: [Synth 8-6155] done synthesizing module 'hazard_forwarding_unit' (24#1) [D:/y/third_year_proj/MP/repo/syn/Pipeline/hazard_forwarding_unit.v:19]
+INFO: [Synth 8-6157] synthesizing module 'SP_Unit' [D:/y/third_year_proj/MP/repo/syn/Pipeline/Virtual_SP.v:1]
+WARNING: [Synth 8-5788] Register virtual_SP_reg in module SP_Unit is has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [D:/y/third_year_proj/MP/repo/syn/Pipeline/Virtual_SP.v:54]
+INFO: [Synth 8-6155] done synthesizing module 'SP_Unit' (25#1) [D:/y/third_year_proj/MP/repo/syn/Pipeline/Virtual_SP.v:1]
+INFO: [Synth 8-6157] synthesizing module 'M_WB_Latch' [D:/y/third_year_proj/MP/repo/syn/Latches/M_Wb.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'M_WB_Latch' (26#1) [D:/y/third_year_proj/MP/repo/syn/Latches/M_Wb.v:1]
+INFO: [Synth 8-6157] synthesizing module 'ports_interrupt' [D:/y/third_year_proj/MP/repo/syn/Ports/ports_interrupt.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'ports_interrupt' (27#1) [D:/y/third_year_proj/MP/repo/syn/Ports/ports_interrupt.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'top' (28#1) [D:/y/third_year_proj/MP/repo/syn/TOP/top.v:1]
+WARNING: [Synth 8-3331] design bypass_jmp has unconnected port IR[2]
+WARNING: [Synth 8-3331] design hazard_CU has unconnected port sf1
+WARNING: [Synth 8-3331] design Memory_Stage_CU has unconnected port IR[1]
+WARNING: [Synth 8-3331] design Memory_Stage_CU has unconnected port IR[0]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 889.211 ; gain = 244.027
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 889.211 ; gain = 244.027
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 889.211 ; gain = 244.027
+---------------------------------------------------------------------------------
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [D:/y/third_year_proj/MP/repo/syn/constraints.xdc]
+Finished Parsing XDC File [D:/y/third_year_proj/MP/repo/syn/constraints.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [D:/y/third_year_proj/MP/repo/syn/constraints.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/top_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/top_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1030.250 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.017 . Memory (MB): peak = 1030.250 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1030.250 ; gain = 385.066
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a35tcpg236-2L
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1030.250 ; gain = 385.066
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1030.250 ; gain = 385.066
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5544] ROM "SE2" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "HLT_en" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'Fetch_Stage_CU'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+           S_RESET_INTER |                               00 |                              000
+                S_FETCH1 |                               01 |                              001
+                S_FETCH2 |                               10 |                              010
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'Fetch_Stage_CU'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 1030.250 ; gain = 385.066
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 3     
+	   3 Input      9 Bit       Adders := 1     
+	   2 Input      8 Bit       Adders := 6     
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	                8 Bit    Registers := 272   
+	                5 Bit    Registers := 1     
+	                4 Bit    Registers := 1     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 12    
+	                1 Bit    Registers := 25    
++---Muxes : 
+	   4 Input      8 Bit        Muxes := 9     
+	   2 Input      8 Bit        Muxes := 30    
+	   2 Input      5 Bit        Muxes := 1     
+	   4 Input      4 Bit        Muxes := 2     
+	   2 Input      4 Bit        Muxes := 3     
+	   7 Input      3 Bit        Muxes := 1     
+	   2 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 33    
+	  15 Input      2 Bit        Muxes := 1     
+	   4 Input      2 Bit        Muxes := 3     
+	   3 Input      2 Bit        Muxes := 4     
+	   6 Input      2 Bit        Muxes := 1     
+	  10 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 303   
+	   5 Input      1 Bit        Muxes := 5     
+	  12 Input      1 Bit        Muxes := 1     
+	   3 Input      1 Bit        Muxes := 8     
+	   8 Input      1 Bit        Muxes := 2     
+	   6 Input      1 Bit        Muxes := 1     
+	   7 Input      1 Bit        Muxes := 1     
+	  10 Input      1 Bit        Muxes := 3     
+	  13 Input      1 Bit        Muxes := 4     
+	  14 Input      1 Bit        Muxes := 1     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Hierarchical Component Statistics 
+---------------------------------------------------------------------------------
+Hierarchical RTL Component report 
+Module pc_in_mux 
+Detailed RTL Component Info : 
++---Muxes : 
+	   4 Input      8 Bit        Muxes := 1     
+Module PC 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      8 Bit       Adders := 1     
++---Registers : 
+	                8 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 1     
+Module mem_addr_mux 
+Detailed RTL Component Info : 
++---Muxes : 
+	   4 Input      8 Bit        Muxes := 1     
+Module Memory 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      8 Bit       Adders := 1     
++---Registers : 
+	                8 Bit    Registers := 257   
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 256   
+Module mux_2to1 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 1     
+Module instruction_reg 
+Detailed RTL Component Info : 
++---Registers : 
+	                8 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 2     
+Module regfile 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      8 Bit       Adders := 2     
++---Registers : 
+	                8 Bit    Registers := 4     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 6     
+	   4 Input      8 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 6     
+	   5 Input      1 Bit        Muxes := 1     
+Module mux_2to1__parameterized0 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input      2 Bit        Muxes := 1     
+Module mux_4to1 
+Detailed RTL Component Info : 
++---Muxes : 
+	   4 Input      8 Bit        Muxes := 1     
+Module control_unit_branch_logic 
+Detailed RTL Component Info : 
++---Muxes : 
+	   7 Input      3 Bit        Muxes := 1     
+Module CU_ALU 
+Detailed RTL Component Info : 
++---Muxes : 
+	   4 Input      4 Bit        Muxes := 2     
+	   2 Input      4 Bit        Muxes := 1     
+	  15 Input      2 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 1     
+	   4 Input      2 Bit        Muxes := 1     
+	  12 Input      1 Bit        Muxes := 1     
+	   3 Input      1 Bit        Muxes := 1     
+Module CU_CCR 
+Detailed RTL Component Info : 
++---Muxes : 
+	   5 Input      1 Bit        Muxes := 3     
+Module RegFile_ControlUnit 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 3     
+	   8 Input      1 Bit        Muxes := 2     
+	   6 Input      1 Bit        Muxes := 1     
+Module Memory_Stage_CU 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 4     
+	   5 Input      1 Bit        Muxes := 1     
+	   7 Input      1 Bit        Muxes := 1     
+Module Write_Back_Stage_CU 
+Detailed RTL Component Info : 
++---Muxes : 
+	  10 Input      1 Bit        Muxes := 3     
+	  13 Input      1 Bit        Muxes := 4     
+	   2 Input      1 Bit        Muxes := 3     
+Module Fetch_Stage_CU 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	                2 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      2 Bit        Muxes := 5     
+	   3 Input      2 Bit        Muxes := 4     
+	   6 Input      2 Bit        Muxes := 1     
+	  10 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 14    
+	   3 Input      1 Bit        Muxes := 7     
+Module hazard_CU 
+Detailed RTL Component Info : 
++---Muxes : 
+	   4 Input      2 Bit        Muxes := 1     
+Module Control_Unit 
+Detailed RTL Component Info : 
++---Registers : 
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module D_Ex_Latch 
+Detailed RTL Component Info : 
++---Registers : 
+	                8 Bit    Registers := 2     
+	                5 Bit    Registers := 1     
+	                4 Bit    Registers := 1     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 5     
+	                1 Bit    Registers := 8     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 2     
+	   2 Input      5 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 1     
+	   2 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 5     
+	   2 Input      1 Bit        Muxes := 2     
+Module bypass_jmp 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input      2 Bit        Muxes := 3     
+	   4 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+Module ALU 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 3     
+	   3 Input      9 Bit       Adders := 1     
+	   2 Input      8 Bit       Adders := 1     
++---Muxes : 
+	  14 Input      1 Bit        Muxes := 1     
+Module CCR 
+Detailed RTL Component Info : 
++---Registers : 
+	                8 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 1     
+Module Ex_M_Latch 
+Detailed RTL Component Info : 
++---Registers : 
+	                8 Bit    Registers := 2     
+	                2 Bit    Registers := 3     
+	                1 Bit    Registers := 7     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 2     
+	   2 Input      2 Bit        Muxes := 3     
+	   2 Input      1 Bit        Muxes := 2     
+Module hazard_forwarding_unit 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input      2 Bit        Muxes := 6     
+	   2 Input      1 Bit        Muxes := 4     
+Module SP_Unit 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      8 Bit       Adders := 1     
++---Registers : 
+	                8 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 9     
+	   2 Input      2 Bit        Muxes := 4     
+	   2 Input      1 Bit        Muxes := 2     
+Module M_WB_Latch 
+Detailed RTL Component Info : 
++---Registers : 
+	                8 Bit    Registers := 1     
+	                2 Bit    Registers := 3     
+	                1 Bit    Registers := 5     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 3     
+	   2 Input      1 Bit        Muxes := 2     
+Module ports_interrupt 
+Detailed RTL Component Info : 
++---Registers : 
+	                8 Bit    Registers := 2     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+---------------------------------------------------------------------------------
+Finished RTL Hierarchical Component Statistics
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 90 (col length:60)
+BRAMs: 100 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+Warning: Parallel synthesis criteria is not met 
+INFO: [Synth 8-3886] merging instance 'u_D_Ex_Latch/Flags_reg[2]' (FDCE) to 'u_D_Ex_Latch/Flags_reg[3]'
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_Memory/\Data_base_reg_reg[0] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_Memory/\Data_base_reg_reg[1] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_Memory/\Data_base_reg_reg[2] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_Memory/\Data_base_reg_reg[3] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_Memory/\Data_base_reg_reg[4] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_Memory/\Data_base_reg_reg[5] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_Memory/\Data_base_reg_reg[6] )
+INFO: [Synth 8-3333] propagating constant 1 across sequential element (u_Memory/\Data_base_reg_reg[7] )
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:56 ; elapsed = 00:00:58 . Memory (MB): peak = 1093.867 ; gain = 448.684
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:02 ; elapsed = 00:01:04 . Memory (MB): peak = 1093.867 ; gain = 448.684
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:01:48 ; elapsed = 00:01:51 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:01:50 ; elapsed = 00:01:52 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:01:51 ; elapsed = 00:01:54 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:51 ; elapsed = 00:01:54 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:52 ; elapsed = 00:01:54 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:52 ; elapsed = 00:01:54 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:52 ; elapsed = 00:01:54 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:52 ; elapsed = 00:01:54 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+-------+------+
+|      |Cell   |Count |
++------+-------+------+
+|1     |BUFG   |     4|
+|2     |CARRY4 |     8|
+|3     |LUT1   |     2|
+|4     |LUT2   |   164|
+|5     |LUT3   |    57|
+|6     |LUT4   |    94|
+|7     |LUT5   |    75|
+|8     |LUT6   |  1564|
+|9     |MUXF7  |   545|
+|10    |MUXF8  |   272|
+|11    |FDCE   |   165|
+|12    |FDPE   |     9|
+|13    |FDRE   |  2088|
+|14    |LDC    |     8|
+|15    |IBUF   |    11|
+|16    |OBUF   |     9|
++------+-------+------+
+
+Report Instance Areas: 
++------+-----------------+----------------+------+
+|      |Instance         |Module          |Cells |
++------+-----------------+----------------+------+
+|1     |top              |                |  5075|
+|2     |  CCReg          |CCR             |    19|
+|3     |  IR_u           |instruction_reg |    89|
+|4     |  ports          |ports_interrupt |    22|
+|5     |  regFile        |regfile         |    84|
+|6     |  u_ALU          |ALU             |    10|
+|7     |  u_Control_Unit |Control_Unit    |    48|
+|8     |    PC_CU        |Fetch_Stage_CU  |    46|
+|9     |  u_D_Ex_Latch   |D_Ex_Latch      |   273|
+|10    |  u_Ex_M_Latch   |Ex_M_Latch      |   425|
+|11    |  u_M_WB_Latch   |M_WB_Latch      |    69|
+|12    |  u_Memory       |Memory          |  3952|
+|13    |  u_PC           |PC              |    26|
+|14    |  virtual_SP     |SP_Unit         |    34|
++------+-----------------+----------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:52 ; elapsed = 00:01:54 . Memory (MB): peak = 1528.039 ; gain = 882.855
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:46 ; elapsed = 00:01:53 . Memory (MB): peak = 1528.039 ; gain = 741.816
+Synthesis Optimization Complete : Time (s): cpu = 00:01:52 ; elapsed = 00:01:55 . Memory (MB): peak = 1528.039 ; gain = 882.855
+INFO: [Project 1-571] Translating synthesized netlist
+INFO: [Netlist 29-17] Analyzing 833 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1528.039 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 8 instances were transformed.
+  LDC => LDCE: 8 instances
+
+INFO: [Common 17-83] Releasing license: Synthesis
+83 Infos, 7 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:02:07 ; elapsed = 00:02:11 . Memory (MB): peak = 1528.039 ; gain = 1172.160
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1528.039 ; gain = 0.000
+WARNING: [Constraints 18-5210] No constraints selected for write.
+Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
+INFO: [Common 17-1381] The checkpoint 'D:/y/third_year_proj/MP/repo/syn/pipeline_syn.runs/synth_1/top.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file top_utilization_synth.rpt -pb top_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Fri Dec 26 14:08:03 2025...
