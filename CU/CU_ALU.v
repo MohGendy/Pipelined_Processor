@@ -55,13 +55,12 @@ module CU_ALU (
                             ALU_CONTROL = 4'b0111 ; 
                             SE2 = 1'b0  ; //R[rb]
                         end
-                            2'b10: begin  // SETC - Set Carry
-                            ALU_CONTROL = 4'b1000 ;  
+                        2'b10: begin  // SETC - Set Carry
+                            ALU_CONTROL = 4'b1000 ;
+                            SE2 = 1'b0  ; //dont care  
                         end
                         2'b11: begin  // CLRC - Clear Carry
                             ALU_CONTROL = 4'b1001 ;
-                        end
-                        default : begin 
                             SE2 = 1'b0  ; //dont care
                         end
                     endcase

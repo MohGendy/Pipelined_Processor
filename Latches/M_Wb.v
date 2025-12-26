@@ -35,7 +35,7 @@ module M_WB_Latch (
 
 
     always @(posedge clk or negedge reset) begin
-        if(!reset || flush) begin
+        if(!reset) begin
             // 1
             ra <= 2'b0;
             rb <= 2'b0;
@@ -50,22 +50,35 @@ module M_WB_Latch (
             // 6
             Hlt <= 1'b0;
         end
-        else begin
-            if (ld) begin                
-                // 1
-                ra <= in_ra;
-                rb <= in_rb;
-                // 3
-                RW <= in_RW;
-                SP <= in_SP;
-                SW1 <= in_SW1;
-                SW2 <= in_SW2;
-                out_ld <= in_out_ld;
-                // 5
-                DataOut <= in_DataOut;
-                // 6
-                Hlt <= in_Hlt;
-            end
+        else if (flush) begin
+            // 1
+            ra <= 2'b0;
+            rb <= 2'b0;
+            // 3
+            RW <= 1'b0;
+            SP <= 2'b0;
+            SW1 <= 1'b0;
+            SW2 <= 1'b0;
+            out_ld <= 1'b0;
+            // 5
+            DataOut <= 8'b0;
+            // 6
+            Hlt <= 1'b0;
+        end
+        else if (ld) begin                
+            // 1
+            ra <= in_ra;
+            rb <= in_rb;
+            // 3
+            RW <= in_RW;
+            SP <= in_SP;
+            SW1 <= in_SW1;
+            SW2 <= in_SW2;
+            out_ld <= in_out_ld;
+            // 5
+            DataOut <= in_DataOut;
+            // 6
+            Hlt <= in_Hlt;  
         end
     end
 endmodule

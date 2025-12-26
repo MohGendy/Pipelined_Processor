@@ -12,7 +12,6 @@ always @(*) begin
         2'b01: pc_in = I_out;
         2'b10: pc_in = reg_rb_d;
         2'b11: pc_in = data_out;
-        default: pc_in = 8'b0;
     endcase 
 end
 endmodule

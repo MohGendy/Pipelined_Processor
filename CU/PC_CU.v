@@ -36,24 +36,30 @@ always @(*) begin
 end
 
 always @(posedge clk or negedge reset) begin
-    if (intr || !reset)
+    if (!reset)
         state <= S_RESET_INTER;
+    else if (intr) begin
+        state <= S_RESET_INTER;
+    end
     else
         state <= next_state;
 end
 
 // Track if PC was loaded (for branches, jumps, etc.)
 always @(posedge clk or negedge reset) begin
-    if (!reset || intr)
+    if (!reset)
         pc_was_loaded <= 1'b1;
+	else if (intr) begin
+		pc_was_loaded <= 1'b1;
+	end
     else
         pc_was_loaded <= 1'b0;
 end
 
 // counter for wait state
 always @(posedge clk or negedge reset) begin
-    if (!reset || intr) 
-        counter <= 2'b00;
+    if (!reset) counter <= 2'b00;
+    else if(intr) counter <= 2'b00;
     else
     if (state == S_FETCH1 &! stall_in)
         counter <= next_counter;

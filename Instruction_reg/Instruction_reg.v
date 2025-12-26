@@ -7,7 +7,11 @@ module instruction_reg  (
     output reg [7:0] ir
 );
     always @(posedge clk or negedge rst) begin
-        if (!rst || flush) begin
+        if (!rst) begin
+            ir <= 0;
+            reg_sf1<= 0;
+        end
+        else if (flush) begin
             ir <= 0;
             reg_sf1<= 0;
         end

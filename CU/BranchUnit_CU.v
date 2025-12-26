@@ -27,7 +27,6 @@ module control_unit_branch_logic (
                         2'b01: bu_op = 3'b010; // JN (Jump Negative)
                         2'b10: bu_op = 3'b011; // JC (Jump Carry)
                         2'b11: bu_op = 3'b100; // JV (Jump Overflow)
-                        default: bu_op = 3'b000;
                     endcase
                 end
 

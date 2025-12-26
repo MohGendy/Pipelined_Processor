@@ -153,7 +153,7 @@ assign ra = IR[3:2] ; //or brx
     hazard_CU u_hazard_CU(
         .opcode     (op_code     ),
         .ra         (ra          ),
-        .sf1        (sf1         ),
+        .sf1        (reg_sf1     ),
         .has_hazard (has_hazard  )
     );
     

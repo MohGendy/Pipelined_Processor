@@ -45,7 +45,7 @@ module Ex_M_Latch (
 
 
     always @(posedge clk or negedge reset) begin
-        if(!reset || flush) begin
+        if(!reset) begin
             // 1
             ra <= 2'b0;
             rb <= 2'b0;
@@ -65,28 +65,45 @@ module Ex_M_Latch (
             // 6
             Hlt <= 1'b0;          
         end 
-        else begin
-            if (ld) begin                
-                // 1
-                ra <= in_ra;
-                rb <= in_rb;
-                // 2
-                R_rb <= in_R_rb;
-                // 3
-                RW <= in_RW;
-                SP <= in_SP;
-                SW1 <= in_SW1;
-                SW2 <= in_SW2;
-                out_ld <= in_out_ld;
-                // 4
-                MW <= in_MW;
-                SM2 <= in_SM2;
-                // 5
-                res <= in_res;
-                // 6
-                Hlt <= in_Hlt;
-
-            end
+        else if (flush) begin
+            // 1
+            ra <= 2'b0;
+            rb <= 2'b0;
+            // 2
+            R_rb <= 8'b0;
+            // 3
+            RW <= 1'b0;
+            SP <= 2'b0;
+            SW1 <= 1'b0;
+            SW2 <= 1'b0;
+            out_ld <= 1'b0;
+            // 4
+            MW <= 1'b0;
+            SM2 <= 1'b0;
+            // 5
+            res <= 8'b0;  
+            // 6
+            Hlt <= 1'b0; 
+        end
+        else if (ld) begin                
+            // 1
+            ra <= in_ra;
+            rb <= in_rb;
+            // 2
+            R_rb <= in_R_rb;
+            // 3
+            RW <= in_RW;
+            SP <= in_SP;
+            SW1 <= in_SW1;
+            SW2 <= in_SW2;
+            out_ld <= in_out_ld;
+            // 4
+            MW <= in_MW;
+            SM2 <= in_SM2;
+            // 5
+            res <= in_res;
+            // 6
+            Hlt <= in_Hlt;
         end 
     end
 endmodule
