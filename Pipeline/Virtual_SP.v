@@ -75,6 +75,10 @@ module SP_Unit (
                 BypassOut = ALU_res;
                 Invalid = 1'b0;
             end
+            else if (SP_Ex[1]) begin
+                BypassOut = virtual_SP;
+                Invalid = 1'b0;
+            end
             else begin
                 BypassOut = virtual_SP;
                 Invalid = 1'b1;
