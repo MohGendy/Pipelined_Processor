@@ -200,7 +200,7 @@ module top (
         assign flush_D_Ex = (!stall) & (flush | stall_d | flush_next) ;
 
         assign ld_IR      = (!stall) & (! stall_d) & (!stall_CU);
-        assign flush_IR   = (!stall ) & (flush | ~SD2)   ; //* SD2 added to flush on immediate
+        assign flush_IR   = (!stall ) & (flush | ~SD2); //* SD2 added to flush on immediate
 
         assign bypass_decode_done = ~stall_d ; 
         assign PC_en_assigned = pc_en & ~stall & ~stall_d;
@@ -232,7 +232,7 @@ module top (
     );
 
     Memory u_Memory( //:)
-        .clk    (clk &! Hlt_en_M ),
+        .clk    (clk &! Hlt_en_M),
         .rst    (rst            ),
         .I_addr (I_addr         ),
         .D_addr (res_M          ),
@@ -362,6 +362,7 @@ module top (
         .in_SE3         (SE3                 ),
         .in_Hlt         (HLT_en              ),
         .in_has_hazard  (has_hazard          ),
+
         .clk            (clk &! Hlt_en_Ex    ),
         .reset          (rst                 ),
         .ld             (ld_D_Ex             ),
