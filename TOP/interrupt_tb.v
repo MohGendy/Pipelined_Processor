@@ -353,6 +353,7 @@ endtask
         
         check_PC(8'hB0, "interrupt jumbs to the ISR");
         
+        interrupt = 1'b0 ; 
         // TEST 2: ADD R1, R2
         $display("\n--- TEST 2: ADD ---");
         wait_cycles(1);
@@ -363,7 +364,6 @@ endtask
         wait_cycles(1);
         check_register(2'b01, 8'h07, "ADD R1, R2 (2+5=7 & C_flag=0)");
         
-        interrupt = 1'b0 ; 
 
         // TEST 3: SUB R1, R1
         $display("\n--- TEST 3:1st I in ISR SUB ---");

@@ -76,7 +76,7 @@ module Top_tb;
     // TASK 3: Loading From Assembler
     //==========================================================================
     task load_hex_file;
-    input [100*8:1] filename;
+    input [80*8:1] filename;
     begin
         $readmemh(filename, uut.u_Memory.Mem);
         $display("[INFO] Loaded program from %0s", filename);
@@ -100,7 +100,7 @@ module Top_tb;
     task check_register;
         input [1:0] reg_num;
         input [7:0] expected;
-        input [100*8:1] test_name;
+        input [80*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -125,7 +125,7 @@ module Top_tb;
     task check_flag;
     input [1:0] flag_type; // 0=Z, 1=N, 2=C, 3=V
     input expected;
-    input [100*8:1] test_name;
+    input [80*8:1] test_name;
     reg actual;
     reg [7:0] f_name; // To store string name of flag
     begin
@@ -157,7 +157,7 @@ endtask
     task check_memory;
         input [7:0] addr;
         input [7:0] expected;
-        input [100*8:1] test_name;
+        input [80*8:1] test_name;
         reg [7:0] actual;
         begin
             total_tests = total_tests + 1;
@@ -224,7 +224,7 @@ endtask
     //==========================================================================
     task check_output_port;
         input [7:0] expected;
-        input [100*8:1] test_name;
+        input [80*8:1] test_name;
         begin
             total_tests = total_tests + 1;
             
@@ -451,14 +451,14 @@ endtask
         
 
         //TEST OUT
-        $display("\n--- TEST 10: OUT ---");
         In_port = 8'hCD;  
         wait_cycles(1);
 
         //TEST IN
-        $display("\n--- TEST 11: IN ---");
         wait_cycles(1); 
+        $display("\n--- TEST 10: OUT ---");
         check_output_port(8'h55, "OUT R0 sends 0x55 to Out_port");
+        $display("\n--- TEST 11: IN ---");
         check_register(2'b01, 8'hCD, "IN R1 receives 0xCD from In_port");
 
         // TEST NOT
@@ -514,7 +514,7 @@ endtask
         // B-FORMAT TEST CASES
         //==================================================================
         //TEST JZ
-        $display("\n--- TEST 21: JZ ---");
+        $display("\n--- TEST 21: JZ & JC ---");
         check_PC(8'd32, "JZ to R1 (Should NOT jump as Z=0)");
 
         // SETC
