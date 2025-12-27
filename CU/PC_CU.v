@@ -20,9 +20,7 @@ module Fetch_Stage_CU (
 
 localparam  S_RESET_INTER = 3'd0,
             S_FETCH1 = 3'd1,
-            S_FETCH2 = 3'd2,
-            S_WAIT   = 3'd3,
-            S_BRANCH = 3'd4;
+            S_FETCH2 = 3'd2;
 
 reg [1:0]   counter;
 reg [2:0] state, next_state;

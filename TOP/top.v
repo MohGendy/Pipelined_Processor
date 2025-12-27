@@ -552,7 +552,7 @@ module top (
     );
 
     SP_Unit virtual_SP(
-        .clk         (clk         ),
+        .clk         (clk & !Hlt_en_Ex),
         .rst         (rst         ),
         .stall       (stall       ),
         .SP          (in_RD_A_D   ),
